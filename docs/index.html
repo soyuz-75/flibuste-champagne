@@ -1,0 +1,877 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex, nofollow">
+<meta name="theme-color" content="#07141c">
+<title>Flibuste &amp; Champagne</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,opsz,wght@0,6..96,400..800;1,6..96,400..800&family=IM+Fell+English:ital@0;1&family=IM+Fell+English+SC&family=Jost:wght@300;400;500;600&display=swap">
+<style>
+/* Concept : pont d'un yacht la nuit, laque et laiton ; le parchemin n'apparaît que pour les cartes et les avis de recherche. */
+:root{
+  color-scheme:dark;
+  --nuit:#07141c; --laque:#0d2430; --laque2:#143240; --lagon:#39c6c0; --laiton:#d9b05a; --laiton2:#8f6f2e;
+  --corail:#ef6a4c; --ecume:#f3eee2; --brume:#a9bcc2;
+  --parch:#e9d9b4; --parch2:#d8c390; --encre:#2b1d10; --sepia:#6d5230; --brique:#9a3a1f;
+  --disp:"Bodoni Moda","Didot","Bodoni 72",Georgia,serif;
+  --fell:"IM Fell English","Iowan Old Style",Georgia,serif;
+  --sc:"IM Fell English SC","IM Fell English",Georgia,serif;
+  --body:"Jost","Futura","Avenir Next",system-ui,sans-serif;
+}
+*{box-sizing:border-box}
+body{margin:0}
+html{scroll-behavior:smooth}
+body{background:var(--nuit);color:var(--ecume);font:400 17px/1.55 var(--body);-webkit-font-smoothing:antialiased;overflow-x:hidden}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:10;background:var(--nuit)}
+a{color:var(--lagon)}
+h1,h2,h3{text-wrap:balance;margin:0;font-weight:500}
+p{margin:0}
+.wrap{max-width:1160px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+:focus-visible{outline:2px solid var(--lagon);outline-offset:2px}
+
+/* navigation */
+nav.top{position:sticky;top:env(safe-area-inset-top,0px);z-index:9;background:color-mix(in srgb,var(--nuit) 92%,transparent);backdrop-filter:blur(8px);border-bottom:1px solid var(--laiton2)}
+nav.top .wrap{display:flex;gap:6px 26px;align-items:center;overflow-x:auto;scrollbar-width:none}
+nav.top a{flex:none;padding:13px 0 11px;color:var(--brume);text-decoration:none;font:500 13px/1 var(--body);letter-spacing:.12em;text-transform:uppercase;border-bottom:2px solid transparent}
+nav.top a.on{color:var(--laiton);border-color:var(--laiton)}
+nav.top a:hover{color:var(--ecume)}
+.view{padding-block:0 72px}
+.view[hidden]{display:none}
+
+/* entêtes de vue */
+.vh{padding-block:48px 28px;max-width:760px}
+.eyebrow{font:500 12.5px/1 var(--body);letter-spacing:.2em;text-transform:uppercase;color:var(--laiton)}
+.vh h1{font:italic 500 clamp(40px,7vw,68px)/1.04 var(--disp);margin-top:12px}
+.vh p{margin-top:14px;color:var(--brume);max-width:62ch}
+h2.s{font:italic 500 clamp(28px,4vw,38px)/1.1 var(--disp);margin-bottom:16px}
+section+section{margin-top:56px}
+
+/* héros */
+.hero{background:radial-gradient(120% 90% at 78% 0%,#1d5361 0%,transparent 60%),radial-gradient(90% 70% at 10% 100%,#3b1d1a 0%,transparent 65%),var(--laque);border-bottom:1px solid var(--laiton2);overflow:hidden}
+.hero .wrap{display:grid;grid-template-columns:minmax(0,1.5fr) minmax(0,1fr);gap:28px;align-items:center;padding-block:44px 40px}
+.hero h1{font:italic 500 clamp(54px,10.5vw,124px)/.92 var(--disp);letter-spacing:-.01em}
+.hero h1 b{display:block;font-weight:500;color:var(--laiton);font-size:.55em;line-height:1.1;font-style:normal;margin-left:.1em}
+.hero .lead{font:italic 22px/1.35 var(--fell);margin-top:18px;color:var(--ecume);max-width:34em}
+.hero .meta{display:flex;flex-wrap:wrap;gap:8px 28px;margin-top:22px;font-size:15px;color:var(--brume)}
+.hero .meta strong{color:var(--ecume);font-weight:500}
+.flag{width:100%;max-width:400px;justify-self:center;filter:drop-shadow(0 18px 30px #0009);transform-origin:0 50%}
+@media (prefers-reduced-motion:no-preference){.flag{animation:houle 7s ease-in-out infinite}}
+@keyframes houle{50%{transform:rotate(-1.5deg) skewY(1deg)}}
+
+/* hublots */
+.ports{display:flex;gap:18px;flex-wrap:wrap;margin-top:28px}
+.port{display:grid;justify-items:center;gap:7px;text-decoration:none;color:var(--brume);font-size:13px}
+.port img{width:74px;height:74px;border-radius:50%;object-fit:cover;object-position:50% 18%;border:3px solid var(--laiton);box-shadow:0 0 0 2px var(--nuit),0 0 0 4px var(--laiton2)}
+.port:hover{color:var(--ecume)}
+
+/* billet */
+.pont-grid{display:grid;grid-template-columns:minmax(0,1.25fr) minmax(0,1fr);gap:24px;padding-top:34px}
+.ticket{display:grid;grid-template-columns:minmax(0,1fr) 128px;background:var(--ecume);color:#16252c;border-radius:6px;overflow:hidden}
+.ticket .m{padding:18px 22px}
+.ticket .k{font:500 11px/1 var(--body);letter-spacing:.16em;text-transform:uppercase;color:#5d6e74}
+.ticket .fly{display:flex;align-items:baseline;gap:14px;margin-top:10px;flex-wrap:wrap}
+.ticket .fly b{font:500 46px/1 var(--disp)}
+.ticket .fly span{color:var(--brique);font-size:22px}
+.ticket .row{display:flex;flex-wrap:wrap;gap:8px 26px;margin-top:14px;font-size:15px}
+.ticket .row div b{display:block;font-weight:600}
+.ticket .stub{border-left:2px dashed #16252c55;padding:18px 12px;display:grid;align-content:center;justify-items:center;text-align:center;background:var(--laiton);gap:2px}
+.stub .n{font:500 50px/1 var(--disp);font-variant-numeric:tabular-nums}
+.stub small{font:500 11px/1.25 var(--body);letter-spacing:.08em;text-transform:uppercase}
+.ret{margin-top:10px;font-size:15px;color:var(--brume)}
+.todo{border-left:3px solid var(--corail);padding:2px 0 2px 16px}
+.todo h3{font:500 13px/1 var(--body);letter-spacing:.16em;text-transform:uppercase;color:var(--corail)}
+.todo ul{margin:12px 0 0;padding:0;list-style:none;display:grid;gap:9px;font-size:16px}
+
+/* frise */
+.frise{display:grid;grid-template-columns:repeat(11,minmax(84px,1fr));overflow-x:auto;padding-bottom:6px}
+.jour{padding:10px 8px 10px 10px;border-left:1px solid var(--laiton2);min-width:0}
+.jour b{display:block;font:500 28px/1 var(--disp);font-variant-numeric:lining-nums}
+.jour i{display:block;font:500 11px/1 var(--body);font-style:normal;letter-spacing:.1em;text-transform:uppercase;color:var(--brume);margin-bottom:6px}
+.jour span{display:block;font-size:13.5px;line-height:1.3;margin-top:7px;color:var(--brume)}
+.jour.mer b{color:var(--lagon)} .jour.terre b{color:var(--laiton)}
+
+/* bateau */
+.bateau{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:28px;align-items:start}
+.specs{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:0 22px;margin:0}
+.specs div{display:flex;justify-content:space-between;gap:12px;border-bottom:1px solid var(--laque2);padding:8px 0}
+.specs dt{color:var(--brume);font-size:15px}.specs dd{margin:0;font-weight:500;font-variant-numeric:tabular-nums;text-align:right}
+.plan svg{width:100%;height:auto;display:block}
+.plan figcaption{font-size:14px;color:var(--brume);margin-top:8px}
+
+/* avis de recherche */
+.avis{background:linear-gradient(135deg,var(--parch),var(--parch2));color:var(--encre);padding:18px;display:grid;gap:14px;box-shadow:0 14px 30px #0008;position:relative;min-width:0}
+.avis::after{content:"";position:absolute;inset:7px;border:1px solid var(--sepia);pointer-events:none}
+.avis>*{position:relative;z-index:1}
+.avis .ph{aspect-ratio:4/5;overflow:hidden;border:1px solid var(--sepia)}
+.avis .ph img{width:100%;height:100%;object-fit:cover;object-position:50% 12%;display:block;filter:sepia(.14) contrast(1.02)}
+.wanted{font:400 15px/1 var(--sc);letter-spacing:.24em;text-align:center;color:var(--brique)}
+.avis h2{font:400 clamp(30px,4.2vw,42px)/1.05 var(--fell);text-align:center}
+.avis .titre{font:italic 18px/1.25 var(--fell);text-align:center;color:var(--sepia)}
+.avis .bio{font:400 17px/1.42 var(--fell)}
+.avis .dev{font:italic 19px/1.3 var(--fell);text-align:center;border-block:1px solid var(--sepia);padding:9px 4px}
+.st{display:grid;gap:6px;font:500 13.5px/1.2 var(--body)}
+.st div{display:grid;grid-template-columns:minmax(0,1fr) 88px 26px;gap:8px;align-items:center}
+.st i{display:block;height:7px;background:#2b1d1022}
+.st i::after{content:"";display:block;height:100%;width:calc(var(--v)*5%);background:var(--brique)}
+.st b{text-align:right;font-weight:600;font-variant-numeric:tabular-nums}
+.kv{display:grid;gap:4px;font:400 14.5px/1.35 var(--body)}
+.kv b{font-weight:600}
+.prime{text-align:center;font:400 17px/1.2 var(--sc);letter-spacing:.06em;color:var(--brique)}
+.chef{grid-template-columns:minmax(0,.9fr) minmax(0,1.1fr);column-gap:24px;align-items:center}
+.chef .ph{grid-row:span 8;aspect-ratio:auto;height:100%;max-height:640px}
+.couple{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:22px;margin-top:22px}
+.lien{font:italic 18px/1.3 var(--fell);color:var(--laiton);text-align:center;margin-top:30px}
+
+/* route */
+.plans{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:18px}
+.plans button{font:500 14.5px/1.2 var(--body);background:none;color:var(--ecume);border:1px solid var(--laiton2);padding:10px 14px;cursor:pointer;text-align:left;border-radius:2px}
+.plans button small{display:block;color:var(--brume);font-size:12.5px;margin-top:3px;font-weight:400}
+.plans button.on{background:var(--laiton);border-color:var(--laiton);color:#14222a}
+.plans button.on small{color:#3b3a2c}
+.wrap.large{max-width:1560px}
+.station{display:grid;grid-template-columns:minmax(0,1fr) 400px;gap:0;border:1px solid var(--laiton2);background:var(--laque);height:calc(100vh - 120px);height:calc(100dvh - 120px);min-height:560px}
+.carte-w{position:relative;min-width:0;min-height:0}
+#carte{position:absolute;inset:0;background:#0b2a3a;font:400 14px/1.4 var(--body)}
+#carte.mesure{cursor:crosshair}
+.coord{position:absolute;left:10px;bottom:30px;z-index:500;background:#07141cd9;color:var(--ecume);font:500 12.5px/1 var(--body);font-variant-numeric:tabular-nums;padding:6px 8px;border-radius:2px;pointer-events:none}
+.coord:empty{display:none}
+.avert{position:absolute;left:50%;top:10px;transform:translateX(-50%);z-index:500;background:#07141cd9;color:var(--brume);font-size:12px;padding:5px 10px;border-radius:2px;pointer-events:none;white-space:nowrap}
+#reticule{position:absolute;left:50%;top:50%;width:34px;height:34px;margin:-17px 0 0 -17px;z-index:500;pointer-events:none;background:linear-gradient(var(--laiton),var(--laiton)) center/2px 100% no-repeat,linear-gradient(var(--laiton),var(--laiton)) center/100% 2px no-repeat;opacity:.85}
+.panneau{display:flex;flex-direction:column;min-height:0;border-left:1px solid var(--laiton2)}
+.ongs{display:grid;grid-template-columns:repeat(4,1fr);border-bottom:1px solid var(--laiton2);flex:none}
+.ong{background:none;border:0;border-bottom:2px solid transparent;color:var(--brume);font:500 12px/1 var(--body);letter-spacing:.1em;text-transform:uppercase;padding:14px 4px 12px;cursor:pointer}
+.ong.on{color:var(--laiton);border-color:var(--laiton)}
+.pan{overflow-y:auto;padding:16px 16px 22px;flex:1;min-height:0;font-size:15px}
+.pan h4{font:500 12px/1.2 var(--body);letter-spacing:.12em;text-transform:uppercase;color:var(--laiton);margin:18px 0 8px}
+.pan h4:first-child{margin-top:0}
+.pan p+p{margin-top:8px}
+.muted{color:var(--brume);font-size:13.5px}
+.pan .plans{margin-bottom:12px}
+.pan .plans button{padding:8px 10px;font-size:13.5px;flex:1 1 30%}
+.btn{background:none;border:1px solid var(--laiton2);color:var(--ecume);font:500 14px/1.2 var(--body);padding:10px 12px;cursor:pointer;border-radius:2px;width:100%;text-align:left}
+.btn[aria-pressed="true"]{background:var(--laiton);color:#14222a;border-color:var(--laiton)}
+.btns{display:grid;gap:8px}
+.lien-btn{background:none;border:0;padding:0;color:var(--lagon);font:inherit;text-decoration:underline;cursor:pointer}
+.pan select,.pan input[type=time]{display:block;width:100%;margin-top:4px;background:var(--nuit);color:var(--ecume);border:1px solid var(--laiton2);font:400 15px var(--body);padding:8px;border-radius:2px;color-scheme:dark}
+.pan input[type=range]{width:100%;accent-color:var(--laiton)}
+.eta-g{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px;font-size:13px;color:var(--brume)}
+.alerte{color:#ffb4a3;border-left:3px solid var(--corail);padding-left:9px}
+.ok{color:#a8e6c1}
+#wx-heure{font:500 15px var(--body);color:var(--ecume);margin:6px 0 4px}
+#wx-legende{display:flex;flex-wrap:wrap;gap:4px 10px;font-size:12px;color:var(--brume);margin:8px 0}
+#wx-legende i{display:inline-block;width:12px;height:12px;margin-right:4px;vertical-align:-2px;border-radius:2px}
+#wx-legende em{font-style:normal}
+.mini{width:100%;height:auto;display:block;margin:2px 0 8px}
+.mini polyline{fill:none;stroke-width:1.8}
+.mini .l-vent{stroke:var(--lagon)}.mini .l-raf{stroke:var(--corail);stroke-dasharray:3 2}.mini .l-houle{stroke:var(--laiton)}
+.mini .nuit{fill:#ffffff0d}
+.mini text{font:10px var(--body);fill:var(--brume)}
+.mini-t{font-size:12.5px;color:var(--brume);margin-top:8px}
+.grp{margin-bottom:12px}
+.grp h4{margin:12px 0 6px}
+.m-btn{display:inline-block;background:none;border:1px solid var(--laque2);color:var(--ecume);font:400 13.5px/1.2 var(--body);padding:6px 9px;margin:0 6px 6px 0;border-radius:2px;cursor:pointer}
+.m-btn:hover{border-color:var(--laiton)}
+.fiche{border:1px solid var(--laiton2);padding:12px;margin-bottom:16px;background:var(--nuit)}
+.fiche-h{display:flex;justify-content:space-between;gap:10px;align-items:flex-start}
+.fiche h3{font:italic 500 22px/1.1 var(--disp)}
+.fiche dl{margin:10px 0;display:grid;gap:7px}
+.fiche dt{font:500 11px/1 var(--body);letter-spacing:.12em;text-transform:uppercase;color:var(--laiton)}
+.fiche dd{margin:3px 0 0;color:var(--ecume);font-size:14px}
+.cond{font-size:14px;margin-top:8px;color:var(--brume)}
+.chip{flex:none;font:600 11.5px/1 var(--body);padding:6px 8px;border-radius:12px;letter-spacing:.04em}
+.chip.bon{background:#2f9e66;color:#fff}.chip.moyen{background:#e3a33a;color:#14222a}.chip.mauvais{background:#d1495b;color:#fff}.chip.na{background:#46606a;color:#fff}.chip.secours{background:#7d5ba6;color:#fff}
+.legende-c{display:grid;gap:5px;font-size:13px;color:var(--brume)}
+.legende-c span{display:flex;gap:8px;align-items:center}
+.legende-c i{flex:none;width:22px;height:12px;display:inline-block}
+.panneau .leg-b{grid-template-columns:58px minmax(0,1fr) 46px;gap:3px 10px;padding:11px 4px}
+.panneau .leg-b h3{font-size:18px}
+.panneau .leg-b .nm{font-size:19px}
+.panneau .leg-b .x{font-size:14px}
+/* Leaflet aux couleurs du bord */
+.leaflet-container a{color:var(--lagon)}
+.leaflet-popup-content-wrapper,.leaflet-popup-tip{background:var(--laque);color:var(--ecume);box-shadow:0 6px 18px #0009}
+.leaflet-popup-content{font:400 14px/1.45 var(--body);margin:12px 14px}
+.leaflet-tooltip{background:var(--nuit);color:var(--ecume);border-color:var(--laiton2);font:500 12.5px var(--body)}
+.leaflet-tooltip-top:before{border-top-color:var(--laiton2)}
+.leaflet-control-layers,.leaflet-bar a{background:var(--laque);color:var(--ecume);border-color:var(--laiton2)!important}
+.leaflet-control-layers{font:400 13.5px/1.5 var(--body)}
+.leaflet-control-layers-toggle{filter:invert(1) hue-rotate(180deg)}
+.leaflet-control-layers-separator{border-color:var(--laiton2)}
+.leaflet-bar a:hover{background:var(--laque2)}
+.leaflet-control-attribution{background:#07141cc0!important;color:var(--brume)}
+.leaflet-control-scale-line{background:#07141cc0;color:var(--ecume);border-color:var(--ecume)}
+.ico-ancre svg{width:26px;height:26px;display:block;filter:drop-shadow(0 1px 2px #000a)}
+.ico-ancre circle:first-child{fill:#46606a;stroke:#f3eee2;stroke-width:1.4}
+.ico-ancre path,.ico-ancre circle+path+circle{stroke:#fff}
+.ico-ancre.bon circle:first-child{fill:#2f9e66}.ico-ancre.moyen circle:first-child{fill:#e3a33a}.ico-ancre.mauvais circle:first-child{fill:#d1495b}.ico-ancre.secours circle:first-child{fill:#7d5ba6}
+.ico-ancre.sel svg{transform:scale(1.3);filter:drop-shadow(0 0 4px #d9b05a)}
+.ico-danger svg{display:block;width:100%;height:100%}
+.ico-bateau svg{width:28px;height:28px;display:block}
+.ico-bateau path{fill:var(--corail);stroke:#fff;stroke-width:1.5}
+.mes-lab{background:#07141ce0;color:#f2c94c;font:600 12px var(--body);padding:3px 6px;border-radius:2px;white-space:nowrap;transform:translate(-50%,-50%);width:max-content!important}
+html.mode-nuit::after{content:"";position:fixed;inset:0;background:#b30000;mix-blend-mode:multiply;pointer-events:none;z-index:99999}
+.legs{display:grid;gap:0;min-width:0}
+.leg-b{display:grid;grid-template-columns:82px minmax(0,1fr) 58px;gap:4px 14px;background:none;border:0;border-top:1px solid var(--laque2);color:inherit;font:inherit;text-align:left;padding:13px 6px;cursor:pointer;width:100%}
+.leg-b:hover{background:var(--laque)}
+.leg-b.on{background:var(--laque);box-shadow:inset 3px 0 0 var(--laiton)}
+.leg-b .d{font:500 13px/1.25 var(--body);letter-spacing:.06em;text-transform:uppercase;color:var(--laiton)}
+.leg-b h3{font:italic 500 22px/1.15 var(--disp)}
+.leg-b .nm{text-align:right;font:500 23px/1 var(--disp);font-variant-numeric:lining-nums}
+.leg-b .nm small{display:block;font:400 12px/1.2 var(--body);color:var(--brume);margin-top:3px}
+.leg-b .x{grid-column:2/4;font-size:15.5px;color:var(--brume);display:none}
+.leg-b.on .x{display:grid;gap:6px;margin-top:3px}
+.leg-b .x b{color:var(--ecume);font-weight:500}
+.total{display:flex;justify-content:space-between;gap:12px;border-top:1px solid var(--laiton2);padding:12px 6px;color:var(--brume);font-size:15px}
+.total b{color:var(--ecume);font-weight:500}
+.tags{display:flex;flex-wrap:wrap;gap:6px}
+.tag{font:500 12px/1 var(--body);padding:5px 8px;border:1px solid var(--laque2);color:var(--brume);border-radius:2px}
+.cols3{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:26px}
+.cols3 h3,.cols2 h3{font:500 13px/1.2 var(--body);letter-spacing:.14em;text-transform:uppercase;color:var(--laiton);margin-bottom:9px}
+.cols3 p,.cols3 li,.cols2 p,.cols2 li{font-size:16px;color:var(--ecume)}
+.cols3 ul,.cols2 ul{margin:0;padding-left:18px;display:grid;gap:6px}
+.scroll{overflow-x:auto}
+table{border-collapse:collapse;width:100%;font-size:15.5px}
+th{text-align:left;font:500 12px/1.2 var(--body);letter-spacing:.12em;text-transform:uppercase;color:var(--laiton);padding:8px 14px 8px 0;border-bottom:1px solid var(--laiton2)}
+td{padding:9px 14px 9px 0;border-bottom:1px solid var(--laque2);vertical-align:top}
+td.n{font-variant-numeric:tabular-nums;white-space:nowrap}
+
+/* escales */
+.filtre{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:26px}
+.filtre button{background:none;border:1px solid var(--laque2);color:var(--brume);font:500 14px/1 var(--body);padding:9px 13px;border-radius:2px;cursor:pointer}
+.filtre button.on{background:var(--lagon);border-color:var(--lagon);color:#07141c}
+.terr{display:grid;grid-template-columns:260px minmax(0,1fr);gap:28px;border-top:1px solid var(--laiton2);padding-top:22px}
+.terr+.terr{margin-top:42px}
+.terr h2{font:italic 500 34px/1.05 var(--disp)}
+.terr dl{margin:14px 0 0;display:grid;gap:7px;font-size:14.5px}
+.terr dt{color:var(--laiton);font:500 11.5px/1 var(--body);letter-spacing:.12em;text-transform:uppercase}
+.terr dd{margin:2px 0 0;color:var(--brume)}
+.lieux{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:22px 28px;align-content:start}
+.lieu h3{font:500 21px/1.15 var(--disp)}
+.lieu p{font-size:16px;color:var(--brume);margin-top:5px}
+.lieu .w{font:italic 16px/1.2 var(--fell);color:var(--laiton);margin-top:5px;display:block}
+.lieu.off{display:none}
+.vue{background:var(--laque);padding:16px 18px;margin-top:42px;font-size:16px}
+.vue b{font-weight:500;color:var(--laiton)}
+
+/* préparatifs */
+.note-sync{font-size:14px;color:var(--brume);margin-top:10px}
+.prep{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:36px 40px}
+.liste h3{font:italic 500 24px/1.1 var(--disp);margin-bottom:4px}
+.liste .sub{font-size:14.5px;color:var(--brume);margin-bottom:8px}
+.liste .prog{font:500 13px/1 var(--body);color:var(--laiton);font-variant-numeric:tabular-nums;margin-left:8px;font-style:normal}
+.ck{display:flex;gap:10px;align-items:flex-start;padding:6px 0;border-bottom:1px solid var(--laque2);font-size:16px;cursor:pointer}
+.ck input{appearance:none;flex:none;width:18px;height:18px;margin:3px 0 0;border:1.5px solid var(--laiton);border-radius:2px;display:grid;place-content:center;cursor:pointer;background:none}
+.ck input:checked{background:var(--laiton)}
+.ck input:checked::after{content:"";width:9px;height:5px;border:2px solid #14222a;border-top:0;border-right:0;transform:rotate(-45deg) translate(1px,-1px)}
+.ck:has(input:checked) span{color:var(--brume);text-decoration:line-through}
+.ck em{font-style:normal;color:var(--lagon);margin-left:auto;padding-left:12px;white-space:nowrap;font-size:14.5px;font-variant-numeric:tabular-nums}
+.heures{display:grid;gap:0;margin:0;padding:0;list-style:none}
+.heures li{display:grid;grid-template-columns:62px minmax(0,1fr);gap:14px;padding:9px 0;border-bottom:1px solid var(--laque2);font-size:16px}
+.heures b{font:500 19px/1.2 var(--disp);color:var(--laiton);font-variant-numeric:lining-nums}
+.sources{font-size:14.5px;color:var(--brume)}
+.sources ul{margin:10px 0 0;padding-left:18px;columns:2;column-gap:32px}
+.sources li{margin-bottom:4px;break-inside:avoid}
+footer{border-top:1px solid var(--laiton2);padding-block:22px;text-align:center;font:italic 17px/1.3 var(--fell);color:var(--brume)}
+
+@media (max-width:860px){
+  .station{grid-template-columns:minmax(0,1fr);height:auto;min-height:0}
+  .carte-w{height:64vh;height:64dvh}
+  .panneau{border-left:0;border-top:1px solid var(--laiton2)}
+  .pan{max-height:none;overflow:visible}
+  .hero .wrap,.pont-grid,.bateau,.prep,.cols3,.terr,.chef{grid-template-columns:minmax(0,1fr)}
+  .flag{max-width:260px;grid-row:1}
+  .chef .ph{grid-row:auto;aspect-ratio:4/5;height:auto}
+  .sources ul{columns:1}
+}
+@media (max-width:620px){
+  body{font-size:16.5px}
+  .couple,.lieux,.specs{grid-template-columns:minmax(0,1fr)}
+  .ticket{grid-template-columns:minmax(0,1fr) 96px}
+  .ticket .fly b{font-size:36px}
+  .stub .n{font-size:38px}
+  .leg-b{grid-template-columns:62px minmax(0,1fr) 50px;gap:4px 10px}
+  .leg-b .x{grid-column:1/4}
+  .avert{left:54px;right:54px;transform:none;white-space:normal;text-align:center;font-size:11px}
+  .leaflet-control-attribution{font-size:9.5px;line-height:1.3;max-width:62%}
+  .coord{bottom:44px}
+}
+@media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}}
+</style>
+</head>
+<body>
+
+<nav class="top" aria-label="Pages du site"><div class="wrap">
+  <a href="#pont" data-v="pont">Le Pont</a>
+  <a href="#equipage" data-v="equipage">L'Équipage</a>
+  <a href="#route" data-v="route">La Route</a>
+  <a href="#escales" data-v="escales">Les Escales</a>
+  <a href="#preparatifs" data-v="preparatifs">Les Préparatifs</a>
+</div></nav>
+
+<main>
+<!-- ================= LE PONT ================= -->
+<div class="view" id="v-pont">
+  <header class="hero"><div class="wrap">
+    <div>
+      <div class="eyebrow">Journal de bord · Saison 2026</div>
+      <h1>Flibuste <b>&amp; Champagne</b></h1>
+      <p class="lead">Cinq forbans, un catamaran, onze jours entre les volcans de la Martinique et les lagons des Grenadines.</p>
+      <div class="meta">
+        <span><strong>27 nov. → 7 déc. 2026</strong></span>
+        <span><strong>Le Marin</strong>, Martinique</span>
+        <span><strong>Cap</strong> Saint-Vincent &amp; Grenadines</span>
+      </div>
+      <div class="ports" id="ports"></div>
+    </div>
+    <svg class="flag" viewBox="0 0 320 220" role="img" aria-label="Pavillon noir : un crâne en lunettes d'aviateur au-dessus de deux flûtes de champagne croisées">
+      <defs><linearGradient id="ver" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#f4d788"/><stop offset="1" stop-color="#8f6f2e"/></linearGradient></defs>
+      <path d="M8 12c50-12 98 12 150 2s100-14 154 0v190c-50-12-104 12-154 2S52 192 8 208z" fill="#0a0d10" stroke="#d9b05a" stroke-width="1.5"/>
+      <rect x="2" y="2" width="6" height="216" fill="#d9b05a"/>
+      <g fill="#f3eee2">
+        <path d="M160 34c-34 0-54 22-54 50 0 18 8 31 20 39v12c0 5 4 8 8 8h52c4 0 8-3 8-8v-12c12-8 20-21 20-39 0-28-20-50-54-50z"/>
+      </g>
+      <g stroke="#0a0d10" stroke-width="2.5"><path d="M144 126v17M160 126v17M176 126v17"/></g>
+      <path d="M160 104l-7 12h14z" fill="#0a0d10"/>
+      <g stroke="#d9b05a" stroke-width="2.6" fill="url(#ver)">
+        <path d="M112 76c10-5 30-5 38 0 2 12-2 28-20 28-13 0-22-14-18-28z"/>
+        <path d="M208 76c-10-5-30-5-38 0-2 12 2 28 20 28 13 0 22-14 18-28z"/>
+      </g>
+      <path d="M150 78c6-3 14-3 20 0M112 76l-10-3M208 76l10-3" stroke="#d9b05a" stroke-width="2.6" fill="none"/>
+      <g id="fl">
+        <g transform="translate(160 184) rotate(62)">
+          <path d="M-7-62h14l-2 34c-1 6-3 8-5 8s-4-2-5-8z" fill="#f3eee2"/><path d="M-5.5-52h11l-1.4 23c-1 5-2 6-4 6s-3-1-4-6z" fill="#d9b05a"/>
+          <rect x="-1" y="-20" width="2" height="40" fill="#f3eee2"/><rect x="-11" y="20" width="22" height="3" rx="1.5" fill="#f3eee2"/>
+        </g>
+        <g transform="translate(160 184) rotate(-62)">
+          <path d="M-7-62h14l-2 34c-1 6-3 8-5 8s-4-2-5-8z" fill="#f3eee2"/><path d="M-5.5-52h11l-1.4 23c-1 5-2 6-4 6s-3-1-4-6z" fill="#d9b05a"/>
+          <rect x="-1" y="-20" width="2" height="40" fill="#f3eee2"/><rect x="-11" y="20" width="22" height="3" rx="1.5" fill="#f3eee2"/>
+        </g>
+      </g>
+    </svg>
+  </div></header>
+
+  <div class="wrap">
+    <div class="pont-grid">
+      <div>
+        <div class="ticket">
+          <div class="m">
+            <div class="k">Air France · Vendredi 27 novembre 2026</div>
+            <div class="fly"><b>CDG</b><span>→</span><b>FDF</b></div>
+            <div class="row">
+              <div><b>09:40</b>Départ Paris</div>
+              <div><b>13:40</b>Arrivée Fort-de-France</div>
+              <div><b>5</b>Passagers</div>
+            </div>
+          </div>
+          <div class="stub"><span class="n" id="cd">21</span><small id="cdl">jours avant de larguer</small></div>
+        </div>
+        <p class="ret">Retour Fort-de-France → Paris le lundi 7 décembre à 20:35.</p>
+      </div>
+      <div class="todo">
+        <h3>À régler avant de larguer</h3>
+        <ul>
+          <li>Star Voyage : accord pour aller à Saint-Vincent et naviguer de nuit, cruising licence, heures d'embarquement et de restitution, caution</li>
+          <li>Louer un Starlink pour le bord</li>
+          <li>Hôtel en Martinique à choisir, nuits du 5 et du 6 décembre</li>
+          <li>Transfert aéroport → Le Marin pour 5 et les bagages</li>
+        </ul>
+      </div>
+    </div>
+
+    <section style="margin-top:44px">
+      <h2 class="s">Onze jours, du premier ti-punch au dernier</h2>
+      <div class="frise" id="frise"></div>
+    </section>
+
+    <section>
+      <h2 class="s">Le navire</h2>
+      <div class="bateau">
+        <div>
+          <p style="margin-bottom:14px;color:var(--brume)">Catamaran Excess 11, années 2023-2024, loué chez Star Voyage au Marin. Un petit cata de performance avec deux postes de barre à l'arrière, assez large pour que cinq personnes s'y perdent de vue.</p>
+          <dl class="specs" id="specs"></dl>
+          <p style="margin-top:12px;font-size:15px;color:var(--brume)">À bord : guindeau électrique, pilote automatique, GPS traceur, VHF, annexe + moteur hors-bord, barbecue, panneaux solaires, bimini rigide, douche de pont, palmes, masques et tubas. <a href="https://www.starvoyage.com/location-catamaran-excess-11.html" target="_blank" rel="noopener">Voir les photos du bateau</a></p>
+        </div>
+        <figure class="plan" style="margin:0">
+          <svg viewBox="0 0 420 300" role="img" aria-label="Schéma des cabines du catamaran">
+            <g fill="#0d2430" stroke="#d9b05a" stroke-width="1.5">
+              <path d="M14 34H296Q372 38 408 55 372 72 296 76H14Z"/>
+              <path d="M14 266H296Q372 262 408 245 372 228 296 224H14Z"/>
+              <rect x="36" y="76" width="214" height="148" fill="#143240"/>
+            </g>
+            <path d="M200 34v42M200 224v42M120 76v148" stroke="#d9b05a" stroke-width="1" fill="none"/>
+            <rect x="250" y="84" width="96" height="132" fill="none" stroke="#39c6c0" stroke-dasharray="4 3"/>
+            <path d="M22 96v108" stroke="#a9bcc2" stroke-width="3"/>
+            <g font-family="Jost,system-ui,sans-serif" font-size="12.5" fill="#f3eee2">
+              <text x="26" y="52">Arrière bâbord</text><text x="26" y="67" fill="#d9b05a">Max &amp; Anastasia</text>
+              <text x="210" y="52">Avant bâbord</text><text x="210" y="67" fill="#d9b05a">Joseph &amp; Iris</text>
+              <text x="26" y="243">Arrière tribord</text><text x="26" y="258" fill="#d9b05a">Capitaine Philippe</text>
+              <text x="210" y="243">Avant tribord</text><text x="210" y="258" fill="#d9b05a">Soute à butin</text>
+              <text x="52" y="154">Cockpit</text><text x="170" y="154" text-anchor="middle" dx="15">Carré</text>
+              <text x="298" y="154" text-anchor="middle" fill="#39c6c0">Trampoline</text>
+            </g>
+            <text x="404" y="154" text-anchor="end" font-family="Jost,system-ui,sans-serif" font-size="12" fill="#a9bcc2">avant →</text>
+          </svg>
+          <figcaption>Schéma indicatif : quatre cabines doubles, quatre salles d'eau. La répartition reste à arbitrer par le capitaine, et l'implantation réelle à vérifier à bord.</figcaption>
+        </figure>
+      </div>
+    </section>
+  </div>
+</div>
+
+<!-- ================= ÉQUIPAGE ================= -->
+<div class="view" id="v-equipage" hidden>
+  <div class="wrap">
+    <header class="vh">
+      <div class="eyebrow">Rôle d'équipage</div>
+      <h1>Recherchés dans toutes les Antilles</h1>
+      <p>Cinq personnages, cinq postes. Toute ressemblance avec des membres de la famille est parfaitement volontaire.</p>
+    </header>
+    <div id="crew"></div>
+  </div>
+</div>
+
+<!-- ================= ROUTE ================= -->
+<div class="view" id="v-route" hidden>
+  <div class="wrap">
+    <header class="vh">
+      <div class="eyebrow">Plans de navigation</div>
+      <h1>De la Martinique aux Grenadines, et retour</h1>
+      <p>Sainte-Lucie se passe au large, sans mouiller ni débarquer. On traverse de nuit, à l'aller et au retour : 76 milles entre Le Marin et Wallilabou, avec un départ en fin d'après-midi et une arrivée au lever du jour. Le reste se fait en petites étapes, dans les lagons.</p>
+    </header>
+  </div>
+  <div class="wrap large">
+    <div class="station">
+      <div class="carte-w">
+        <div id="carte" role="application" aria-label="Carte marine interactive"></div>
+        <div id="reticule" hidden></div>
+        <div class="coord" id="coord"></div>
+        <div class="avert">Carte indicative : ne remplace pas les cartes officielles</div>
+      </div>
+      <aside class="panneau" aria-label="Outils de la carte">
+        <div class="ongs" role="tablist">
+          <button type="button" class="ong on" role="tab" data-o="etapes" aria-selected="true">Étapes</button>
+          <button type="button" class="ong" role="tab" data-o="mouillages" aria-selected="false">Mouillages</button>
+          <button type="button" class="ong" role="tab" data-o="meteo" aria-selected="false">Météo</button>
+          <button type="button" class="ong" role="tab" data-o="outils" aria-selected="false">Outils</button>
+        </div>
+        <div class="pan" data-o="etapes">
+          <div class="plans" id="plans" role="group" aria-label="Choix du plan de navigation"></div>
+          <p id="plan-desc" class="muted" style="margin-bottom:10px"></p>
+          <div class="legs" id="legs"></div>
+          <div class="total" id="total"></div>
+          <h4>Heure d'arrivée de l'étape</h4>
+          <div id="eta"></div>
+        </div>
+        <div class="pan" data-o="mouillages" hidden>
+          <div id="fiche"><p class="muted" style="margin-bottom:12px">Touche une ancre sur la carte ou un nom ci-dessous. Sa couleur dit l'abri à l'heure choisie dans l'onglet Météo : <b style="color:#5fd39a">bon</b>, <b style="color:#e3a33a">moyen</b>, <b style="color:#ff7b8c">exposé</b>, <b style="color:#b79be0">secours seulement</b> (Sainte-Lucie, clearance obligatoire).</p></div>
+          <div id="liste-mouillages"></div>
+        </div>
+        <div class="pan" data-o="meteo" hidden>
+          <p id="wx-etat" class="muted"></p>
+          <h4>Afficher</h4>
+          <select id="wx-mode" aria-label="Donnée météo affichée">
+            <option value="vent">Vent à 10 m</option>
+            <option value="houle">Houle (hauteur et direction)</option>
+            <option value="courant">Courant de surface</option>
+          </select>
+          <h4>Heure</h4>
+          <input type="range" id="wx-temps" min="0" max="72" value="0" aria-label="Heure de la prévision">
+          <div id="wx-heure">…</div>
+          <div id="wx-legende"></div>
+          <p class="muted">Modèles Open-Meteo (vent : meilleur modèle disponible ; mer : MeteoFrance Wave et Copernicus SMOC). Les courants sont un modèle au large, pas les courants de marée entre les îles.</p>
+          <h4>Prévision d'un point</h4>
+          <div id="wx-point"><p class="muted">Touche la carte n'importe où, puis « Prévision 48 h ici ».</p></div>
+          <h4>Bulletins officiels</h4>
+          <ul style="margin:0;padding-left:18px;display:grid;gap:5px">
+            <li><a href="https://meteofrance.mq/fr/marine" target="_blank" rel="noopener">Météo-France Antilles, bulletins marine</a></li>
+            <li><a href="https://www.nhc.noaa.gov/" target="_blank" rel="noopener">NHC, cyclones et ondes tropicales</a></li>
+            <li><a href="https://www.windy.com/?13.6,-61.2,8" target="_blank" rel="noopener">Windy, zone de navigation</a></li>
+          </ul>
+        </div>
+        <div class="pan" data-o="outils" hidden>
+          <div class="btns">
+            <button type="button" class="btn" id="btn-pos">Afficher ma position</button>
+            <p id="pos-res" class="muted"></p>
+            <button type="button" class="btn" id="btn-mesure">Mesurer distance et cap</button>
+            <button type="button" class="btn" id="btn-effacer">Effacer la mesure</button>
+            <p id="mesure-res" class="muted"></p>
+            <button type="button" class="btn" id="btn-ret" aria-pressed="false">Réticule au centre</button>
+            <button type="button" class="btn" id="btn-nuit" aria-pressed="false">Mode nuit (filtre rouge)</button>
+          </div>
+          <h4>Légende</h4>
+          <div class="legende-c">
+            <span><i style="border-top:2px dashed #d1495b"></i>Isobathe 5 m</span>
+            <span><i style="border-top:2px solid #ed8b3a"></i>Isobathe 10 m</span>
+            <span><i style="border-top:2px solid #1f78b4"></i>Isobathes 20 m, 50 m et 100 m</span>
+            <span><i style="background:#e4572e55;border:1px dashed #b03a2e"></i>Récif (OpenStreetMap)</span>
+            <span><i style="background:#2a9d8f33;border:1px dashed #2a9d8f"></i>Zone protégée</span>
+            <span><i style="background:#c0392b33;border:1px dashed #c0392b"></i>Zone interdite ou réglementée</span>
+            <span><i style="border-top:3px solid #d9b05a"></i>Étape choisie</span>
+            <span><i style="border-top:2px dashed #ef6a4c"></i>Aller · <i style="border-top:2px dashed #39c6c0;margin-left:4px"></i>Retour</span>
+          </div>
+          <p class="muted" style="margin-top:12px">Les calques s'activent avec le bouton en haut à droite de la carte. Données : OpenStreetMap et OpenSeaMap (dangers, balisage, zones), NOAA ETOPO 2022 (isobathes, résolution d'environ 450 m), Esri (fonds). Elles peuvent être incomplètes : un récif absent de la carte existe peut-être.</p>
+        </div>
+      </aside>
+    </div>
+  </div>
+  <div class="wrap">
+    <section style="margin-top:56px">
+      <h2 class="s">Lire le ciel et la mer</h2>
+      <div class="cols3">
+        <div><h3>Fin novembre</h3><p>Les alizés se renforcent : 15 à 25 nœuds d'est-nord-est sont un bon repère. La saison des ouragans se termine officiellement le 30 novembre, mais une onde tropicale tardive reste possible. Les grains arrivent vite, soufflent fort et passent en quelques minutes.</p></div>
+        <div><h3>Les canaux</h3><p>Le vent et la houle s'accélèrent entre les îles, surtout entre Martinique et Sainte-Lucie, Sainte-Lucie et Saint-Vincent, Saint-Vincent et Bequia. On réduit la toile avant d'y entrer. La traversée retour, au près avec le courant contre, peut durer plus que prévu.</p></div>
+        <div><h3>La règle d'or</h3><p>Le soleil se couche vers 17 h 40 et se lève vers 6 h. On navigue de nuit, mais on ne mouille jamais de nuit : si le bateau est en avance, on ralentit au large et on attend le jour. La lune décroît : elle se lève en soirée à l'aller, et il ne reste qu'un fin croissant avant l'aube au retour.</p></div>
+      </div>
+    </section>
+
+    <section>
+      <h2 class="s">Quarts de nuit</h2>
+      <p style="color:var(--brume);margin-bottom:12px;max-width:62ch">Proposition à arbitrer par le capitaine, pour les nuits du 28 novembre et du 4 décembre. Deux personnes sur le pont, trois heures chacune, et le capitaine réveillé au moindre doute.</p>
+      <div class="scroll"><table>
+        <thead><tr><th>Quart</th><th>Sur le pont</th><th>À l'aller</th></tr></thead>
+        <tbody>
+          <tr><td class="n">18 h - 21 h</td><td>Philippe et Max</td><td>Sortie du Marin avec les dernières lueurs</td></tr>
+          <tr><td class="n">21 h - 0 h</td><td>Joseph et Iris</td><td>Canal de Sainte-Lucie, point sur la carte chaque heure</td></tr>
+          <tr><td class="n">0 h - 3 h</td><td>Max et Anastasia</td><td>Le long de Sainte-Lucie, au large</td></tr>
+          <tr><td class="n">3 h - 6 h</td><td>Philippe et Joseph</td><td>Canal de Saint-Vincent, puis l'arrivée au jour</td></tr>
+        </tbody>
+      </table></div>
+    </section>
+
+    <section>
+      <h2 class="s">Sécurité et frais de mouillage</h2>
+      <div class="bateau">
+        <div class="cols2">
+          <h3>Consignes du bord</h3>
+          <ul>
+            <li>Annexe relevée et cadenassée chaque nuit, surtout à Wallilabou</li>
+            <li>À Wallilabou, garder quelqu'un à bord quand c'est possible</li>
+            <li>Boat boys : fixer le prix et la devise avant d'accepter leur aide</li>
+            <li>La nuit : gilet, harnais et longe pour tout le monde sur le pont, personne seul à l'extérieur du cockpit</li>
+            <li>Ris pris avant la tombée de la nuit, feux de navigation vérifiés, veille VHF canal 16</li>
+            <li>Bulletin météo chaque matin, et décision du capitaine à 16 h avant chaque départ de nuit</li>
+          </ul>
+        </div>
+        <div class="scroll">
+          <table>
+            <thead><tr><th>Où</th><th>Tarif indicatif</th><th>Source</th></tr></thead>
+            <tbody>
+              <tr><td>Tobago Cays</td><td class="n">60 EC$/nuit + 15 EC$/pers.</td><td>Parc, 2023</td></tr>
+              <tr><td>Mustique</td><td class="n">≈ 200 EC$ jusqu'à 3 nuits</td><td>Guide, 2017</td></tr>
+              <tr><td>Bequia</td><td>Bouée au prix négocié, ou ancre</td><td>À voir sur place</td></tr>
+              <tr><td>Douane SVG</td><td>À demander à la douane</td><td>Non trouvé</td></tr>
+            </tbody>
+          </table>
+          <p style="font-size:14px;color:var(--brume);margin-top:8px">Pour cinq personnes, compter 135 EC$ par nuit aux Tobago Cays. Paiement possible en ligne sur le site du parc. 1 US$ = 2,70 EC$.</p>
+        </div>
+      </div>
+    </section>
+  </div>
+</div>
+
+<!-- ================= ESCALES ================= -->
+<div class="view" id="v-escales" hidden>
+  <div class="wrap">
+    <header class="vh">
+      <div class="eyebrow">Guide des îles</div>
+      <h1>Ce qu'il y a à voir, île par île</h1>
+      <p>Filtre selon le membre d'équipage pour trouver ce qui lui fera poser son verre.</p>
+    </header>
+    <div class="filtre" id="filtre" role="group" aria-label="Filtrer par membre d'équipage"></div>
+    <div id="terr"></div>
+    <div class="vue"><b>Sainte-Lucie, vue depuis la mer.</b> Pas d'escale, donc pas de formalités : on longe l'île à distance, de nuit. Il faudra se contenter des lumières de la côte et, avec un peu de lune, de la silhouette des deux Pitons classés à l'Unesco. Joseph prendra ça pour un défi.</div>
+
+    <section>
+      <h2 class="s">Deux nuits de grand luxe, 5 et 6 décembre</h2>
+      <p style="color:var(--brume);margin-bottom:12px;max-width:62ch">Le bateau est rendu le samedi matin et le vol décolle le lundi à 20:35 : il reste à choisir le repaire. Toute la journée de lundi reste libre, à condition de négocier un départ tardif de la chambre. Prix et disponibilités à vérifier directement.</p>
+      <div class="scroll"><table>
+        <thead><tr><th>Hôtel</th><th>Lieu</th><th>Pourquoi</th></tr></thead>
+        <tbody>
+          <tr><td>Cap Est Lagoon Resort &amp; Spa</td><td>Le François</td><td>Le choix jet-set : suites, spa, Relais &amp; Châteaux. À côté de l'Habitation Clément et des fonds blancs.</td></tr>
+          <tr><td>Hôtel Plein Soleil</td><td>Le François</td><td>Boutique-hôtel de bungalows design sur une colline, vue sur la baie. Le préféré probable d'Iris.</td></tr>
+          <tr><td>La Suite Villa</td><td>Trois-Îlets</td><td>Suites et villas à flanc de colline, décoration très personnelle.</td></tr>
+          <tr><td>Hôtel Bakoua</td><td>Trois-Îlets</td><td>Classique, sur la mer, restaurants à pied, à une traversée de vedette de Fort-de-France.</td></tr>
+        </tbody>
+      </table></div>
+    </section>
+  </div>
+</div>
+
+<!-- ================= PRÉPARATIFS ================= -->
+<div class="view" id="v-preparatifs" hidden>
+  <div class="wrap">
+    <header class="vh">
+      <div class="eyebrow">Ordres de mission</div>
+      <h1>Ce qu'il faut faire avant de lever l'ancre</h1>
+      <p>Les cases se cochent ici, pour tout l'équipage.</p>
+      <p class="note-sync" id="sync">Cases enregistrées sur ce téléphone ou cet ordinateur : chacun coche sa propre liste.</p>
+    </header>
+
+    <section>
+      <h2 class="s">Vendredi 27 novembre, heure par heure</h2>
+      <ul class="heures" id="heures"></ul>
+    </section>
+
+    <section>
+      <h2 class="s">Menus des trois premiers jours</h2>
+      <div class="scroll"><table>
+        <thead><tr><th></th><th>Matin</th><th>Midi</th><th>Soir</th></tr></thead>
+        <tbody>
+          <tr><td>Sam. 28</td><td>Café, pain, œufs, fruits</td><td>Grande salade, thon, avocat, au ponton</td><td>Plat chaud à 17 h avant de partir, puis thermos de café et en-cas pour les quarts</td></tr>
+          <tr><td>Dim. 29</td><td>Grand petit-déjeuner une fois au mouillage</td><td>Wraps et fruits, sieste obligatoire</td><td>Barbecue à Wallilabou, ou dîner à terre si la douane est passée</td></tr>
+          <tr><td>Lun. 30</td><td>Yaourts, pain grillé, fruits</td><td>Riz froid, crudités, feta</td><td>Restaurant à Bequia, puis ravitaillement à Port Elizabeth</td></tr>
+        </tbody>
+      </table></div>
+      <p style="font-size:15px;color:var(--brume);margin-top:10px">Le frigo fait 130 litres : on déballe les cartons avant d'embarquer, et les boissons passent au frais à tour de rôle. Quantités prévues pour cinq personnes sur trois jours.</p>
+    </section>
+
+    <section class="prep" id="listes"></section>
+
+    <section class="sources">
+      <h2 class="s">Sources</h2>
+      <p>Consultées le 6 novembre 2026. Les formalités et les tarifs changent : vérifie-les sur place ou auprès de la base. Cette page ne remplace ni les cartes marines ni les bulletins météo.</p>
+      <ul>
+        <li><a href="https://www.starvoyage.com/location-catamaran-excess-11.html" target="_blank" rel="noopener">Star Voyage, fiche Excess 11</a></li>
+        <li><a href="https://tourism.gov.vc/tourism/index.php/clearance-procedures" target="_blank" rel="noopener">SVG Tourism, procédures de clearance</a></li>
+        <li><a href="https://www.noonsite.com/place/st-vincent-the-grenadines/st-vincent/wallilabou-bay/view/docking" target="_blank" rel="noopener">Noonsite, Wallilabou</a></li>
+        <li><a href="https://www.noonsite.com/place/martinique/le-marin/view/clearance" target="_blank" rel="noopener">Noonsite, clearance au Marin</a></li>
+        <li><a href="https://www.tobagocays.org/wp-content/uploads/2023/01/New-Fees-TCMP.pdf" target="_blank" rel="noopener">Tobago Cays Marine Park, tarifs 2023</a></li>
+        <li><a href="https://www.noonsite.com/place/st-vincent-the-grenadines/mustique/britannia-bay-lovell/view/docking" target="_blank" rel="noopener">Noonsite, Britannia Bay à Mustique</a></li>
+        <li><a href="https://www.dreamyachtcharter.com/wp-content/uploads/nausys/base_documents/519140/BaseGuide_Bareboat_FR-Martinique.pdf" target="_blank" rel="noopener">Dream Yacht, guide de base du Marin</a></li>
+        <li><a href="https://www.noonsite.com/?p=73351642" target="_blank" rel="noopener">Noonsite, SVG après l'ouragan Beryl</a></li>
+        <li><a href="https://news.caricoos.org/2026/09/02/outlook-of-sargassum-blooms-august-31-2026/" target="_blank" rel="noopener">USF, prévisions sargasses, août 2026</a></li>
+        <li><a href="https://www.netify.ai/resources/telco/starlink/country/vc" target="_blank" rel="noopener">Starlink à Saint-Vincent</a></li>
+        <li><a href="https://kitesurfgrenadines.com/?p=139" target="_blank" rel="noopener">Statistiques de vent aux Grenadines</a></li>
+        <li><a href="https://visarequirements.info/countries/ukraine/saint-vincent-and-the-grenadines/" target="_blank" rel="noopener">Visa SVG pour passeport ukrainien (site non officiel)</a></li>
+      </ul>
+    </section>
+  </div>
+</div>
+</main>
+<footer><div class="wrap">Sur ce navire, on ne jette que l'ancre.</div></footer>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
+<script src="carte.js"></script>
+<script>
+const $=(s,r=document)=>r.querySelector(s), $$=(s,r=document)=>[...r.querySelectorAll(s)];
+const esc=s=>String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;');
+
+/* --- vues --- */
+const VIEWS=['pont','equipage','route','escales','preparatifs'];
+function show(v,scroll){
+  if(!VIEWS.includes(v))v='pont';
+  VIEWS.forEach(x=>{$('#v-'+x).hidden=x!==v});
+  $$('nav.top a').forEach(a=>{const on=a.dataset.v===v;a.classList.toggle('on',on);on?a.setAttribute('aria-current','page'):a.removeAttribute('aria-current')});
+  if(v==='route')Carte.visible();
+  if(scroll)window.scrollTo(0,0);
+  try{localStorage.setItem('fc-vue',v)}catch(e){}
+}
+document.addEventListener('click',e=>{
+  const a=e.target.closest('a[href^="#"]');if(!a)return;
+  e.preventDefault();const v=a.getAttribute('href').slice(1);show(v,true);
+  try{history.replaceState(null,'','#'+v)}catch(e){}
+});
+
+/* --- équipage --- */
+const CREW=[
+ {id:'philippe',nom:'Capitaine Philippe',alias:'dit le Patriarche',titre:'Commandant de la flotte familiale',
+  bio:"Vu pour la dernière fois sextant en main, sourire aux lèvres et uniforme impeccable. A engendré deux fils, un vice qu'il assume. Maître à bord après Dieu, et avant le Wi-Fi. C'est lui qui tient la barre dans les canaux et qui décide, à 16 h, si l'on part dans la nuit.",
+  dev:"Je n'élève jamais la voix. J'élève la grand-voile.",st:[['Commandement',19],['Lecture du ciel',17],['Tenue d\'apparat',20],['Autorité sur ses fils',11]],
+  poste:"Capitaine, barre et décisions",fav:"Rocher du Diamant, ce caillou que la Royal Navy a enregistré comme navire",prime:"10 000 doublons et un magnum"},
+ {id:'max',nom:'Max Main-Verte',alias:"l'Officier Botaniste",titre:"Fils du capitaine, gardien de l'eau douce",
+  bio:"Signalé sur le pont arrosant une fougère en pot, feuillage dans les cheveux. Soupçonné d'avoir embarqué plus de plantes que de cordages. Veille sur les 600 litres d'eau du bord, sur les mouillages et sur tout ce qui pousse à moins d'un mille.",
+  dev:"Une fougère à bord vaut mieux que deux sur la carte.",st:[['Main verte',20],['Mouillage',15],['Survie en jungle',17],['Respect du pot de fleurs',20]],
+  poste:"Second, ancre, eau douce et annexe",fav:"Jardin botanique de Kingstown, parmi les plus anciens des Amériques",prime:"3 000 doublons et une bouture"},
+ {id:'anastasia',nom:"Anastasia l'Hetmane",alias:"Intendante des Belles Choses",titre:"Venue d'Ukraine pour civiliser ce navire",
+  bio:"Couronne de coquelicots, corail au cou, regard qui fait baisser les prix. Elle porte le titre d'hetmane, comme les grands chefs cosaques, et commande la table, l'apéritif et la tenue du soir. Aucun gobelet en plastique n'a survécu à son passage.",
+  dev:"Même une pirate dresse la table.",st:[['Goût très sûr',20],['Négociation',18],['Présence',19],['Patience envers le diesel',6]],
+  poste:"Intendance, carré et grands dîners",fav:"Mustique, pour Basil's Bar et le simple plaisir d'y être vue",prime:"8 000 doublons et une parure de perles"},
+ {id:'joseph',nom:"Joseph Œil-de-Verre",alias:"le Cinéaste de Bord",titre:"Petit frère de Max, artiste en cavale",
+  bio:"Repéré derrière une caméra à manivelle, pinceaux dépassant de la besace. Son œil voit tout, surtout quand la lumière est belle et qu'il faudrait border le génois. Il tient le journal filmé de la croisière et se réserve le droit de refaire chaque coucher de soleil.",
+  dev:"Coupez ! On la refait avec le soleil.",st:[['Cadrage',20],['Lumière dorée',19],['Sens du drame',18],['Aide pendant une prise',4]],
+  poste:"Chroniqueur, images et croquis de bord",fav:"Wallilabou et Petit Tabac, deux décors de cinéma sans billet d'entrée",prime:"3 000 doublons et 36 poses"},
+ {id:'iris',nom:"Iris Compas-d'Or",alias:"l'Architecte des Forts",titre:"Officière des plans",
+  bio:"Connue pour ses plans de forts, qu'elle lit comme d'autres lisent un roman. Trouve un angle mort dans tout mouillage et une erreur de proportion dans tout le reste. Elle tient la carte, trace la route et range le bord avec une rigueur qui inquiète l'équipage.",
+  dev:"Un mouillage se lit comme un fort, par ses angles morts.",st:[['Géométrie',20],['Lecture des plans',19],['Sang-froid',18],['Tolérance au désordre',5]],
+  poste:"Navigatrice, carte et route",fav:"Fort Charlotte, puis la Bibliothèque Schœlcher à Fort-de-France",prime:"8 000 doublons et un compas en or"}
+];
+function avis(c,chef){
+  const st=c.st.map(([k,v])=>`<div><span>${esc(k)}</span><i style="--v:${v}"></i><b>${v}</b></div>`).join('');
+  return `<article class="avis${chef?' chef':''}" id="p-${c.id}">
+   <div class="ph"><img src="img/${c.id}.jpg" alt="Portrait de ${esc(c.nom)}" loading="lazy"></div>
+   <div class="wanted">Avis de recherche</div>
+   <h2>${esc(c.nom)}</h2><div class="titre">${esc(c.alias)}, ${esc(c.titre.charAt(0).toLowerCase()+c.titre.slice(1))}</div>
+   <p class="bio">${esc(c.bio)}</p>
+   <p class="dev">« ${esc(c.dev)} »</p>
+   <div class="st">${st}</div>
+   <div class="kv"><div><b>Poste :</b> ${esc(c.poste)}</div><div><b>Escale fétiche :</b> ${esc(c.fav)}</div></div>
+   <div class="prime">Prime : ${esc(c.prime)}</div></article>`;
+}
+const by=Object.fromEntries(CREW.map(c=>[c.id,c]));
+$('#crew').innerHTML=avis(by.philippe,true)+
+  `<p class="lien">Le fils aîné et l'Hetmane</p><div class="couple" style="margin-top:12px">${avis(by.max)}${avis(by.anastasia)}</div>`+
+  `<p class="lien">Le cadet et l'Architecte</p><div class="couple" style="margin-top:12px">${avis(by.joseph)}${avis(by.iris)}</div>`;
+$('#ports').innerHTML=CREW.map(c=>`<a class="port" href="#equipage"><img src="img/${c.id}.jpg" alt=""><span>${esc(c.nom.split(' ').slice(c.id==='philippe'?1:0,c.id==='philippe'?2:1).join(' '))}</span></a>`).join('');
+
+/* --- frise et fiche --- */
+const FR=[['Ven','27','Paris → Le Marin, courses','terre'],['Sam','28','Départ de nuit','mer'],['Dim','29','Wallilabou à l\'aube','mer'],['Lun','30','Bequia','mer'],['Mar','1','Mustique','mer'],['Mer','2','Tobago Cays','mer'],['Jeu','3','Wallilabou','mer'],['Ven','4','Saint-Vincent, départ de nuit','mer'],['Sam','5','Le Marin, bateau rendu, hôtel','terre'],['Dim','6','Martinique à terre','terre'],['Lun','7','Vol retour à 20:35','terre']];
+$('#frise').innerHTML=FR.map(([j,n,t,k])=>`<div class="jour ${k}"><i>${j}</i><b>${n}</b><span>${esc(t)}</span></div>`).join('');
+$('#specs').innerHTML=[['Longueur','11,33 m'],['Largeur','6,59 m'],['Tirant d\'eau','1,15 m'],['Voilure','77 m²'],['Moteurs','2 × 29 CV'],['Cabines','4 doubles'],['Salles d\'eau','4'],['Couchages','8'],['Eau','2 × 300 L'],['Gasoil','400 L'],['Frigo','130 L'],['Base','Le Marin']].map(([k,v])=>`<div><dt>${k}</dt><dd>${v}</dd></div>`).join('');
+
+/* --- compte à rebours --- */
+(function(){const d=Math.ceil((new Date('2026-11-27T09:40:00+01:00')-Date.now())/864e5);
+ if(d>0){$('#cd').textContent=d;$('#cdl').textContent=d>1?'jours avant de larguer':'jour avant de larguer'}
+ else{$('#cd').textContent='⚓';$('#cdl').textContent='Bon vent'}})();
+
+/* --- route : étapes sur la carte (docs/carte.js) --- */
+const K={marin:[14.462,-60.872],wall:[13.25,-61.278],beq:[13.005,-61.25],mus:[12.875,-61.205],tob:[12.632,-61.358],
+ arl:[14.49,-61.093],stp:[14.74,-61.19],mit:[14.555,-61.06]};
+const OUT=[[14.44,-60.895],[14.385,-60.93],[14.10,-61.10],[13.80,-61.17],[13.40,-61.33]], BACK=[[13.40,-61.30],[13.80,-61.14],[14.10,-61.07],[14.385,-60.92],[14.44,-60.895]];
+const W={
+ mw:[K.marin,...OUT,K.wall],wm:[K.wall,...BACK,K.marin],
+ wb:[K.wall,[13.10,-61.30],[13.02,-61.29],K.beq],bw:[K.beq,[13.02,-61.285],[13.10,-61.295],K.wall],
+ bm:[K.beq,[12.975,-61.27],[12.93,-61.22],K.mus],mb:[K.mus,[12.925,-61.235],[12.98,-61.262],K.beq],
+ mt:[K.mus,[12.80,-61.27],[12.72,-61.37],[12.665,-61.37],K.tob],
+ tw:[K.tob,[12.665,-61.378],[12.72,-61.38],[12.85,-61.33],[13.02,-61.31],[13.12,-61.32],K.wall],
+ ma:[K.marin,[14.44,-60.895],[14.40,-60.93],[14.425,-61.06],K.arl],as:[K.arl,[14.55,-61.13],[14.70,-61.21],K.stp],
+ sm:[K.stp,[14.60,-61.12],K.mit],mm:[K.mit,[14.52,-61.12],[14.42,-61.07],[14.39,-60.93],[14.44,-60.895],K.marin]};
+const SAM="Briefing, inventaire, pleins et sortie de France dans la journée. Dernier repas chaud à 17 h, ris pris, départ vers 18 h. Sainte-Lucie défile au large pendant la nuit.";
+const SAMF="Clearance de sortie de France au Marin avant de partir.";
+const REM="Excursion le matin, douane, sieste l'après-midi. Départ vers 17 h pour la remontée, face aux alizés et avec le courant contre : prévoir 12 à 13 heures, moteur à portée de main.";
+const FIN="Arrivée au Marin au lever du jour. Plein de gasoil, état des lieux, restitution, puis direction l'hôtel.";
+const PLANS={
+ A:{nom:'La Grande Flibuste',sub:'≈ 233 milles, tout le programme',desc:"Le plan complet : Wallilabou, Bequia, Mustique et le lagon des Tobago Cays, avec deux nuits de mer pour gagner du temps aux escales.",legs:[
+  ['Sam. 28','Le Marin → Wallilabou, de nuit','mw',76,SAM,SAMF,'En mer, quarts de 18 h à 6 h'],
+  ['Dim. 29','Arrivée à Wallilabou','mw',0,"Arrivée au jour dans la baie du film. Amarre à terre, sieste, visite du décor en fin de journée.",'Entrée à Saint-Vincent à Wallilabou. Ouverture le dimanche à vérifier : sinon personne ne descend à terre avant le lundi.','Wallilabou'],
+  ['Lun. 30','Wallilabou → Bequia','wb',15,"Douane si besoin, puis une courte étape jusqu'à Admiralty Bay. Bequia est le meilleur endroit pour se ravitailler.",'Clearance à finir ici si elle n\'a pas pu se faire à Wallilabou (Port Elizabeth est aussi un port d\'entrée).','Admiralty Bay, Bequia'],
+  ['Mar. 1','Bequia → Mustique','bm',8,"Petite étape, grande tenue. Bouée obligatoire à Britannia Bay, puis Basil's Bar. C'est la soirée de l'Hetmane.",'Mouillage sur bouée uniquement.','Britannia Bay, Mustique'],
+  ['Mer. 2','Mustique → Tobago Cays','mt',20,"On passe à l'ouest de Canouan et au nord de Mayreau pour entrer dans le lagon en milieu de journée, soleil haut pour lire les fonds. Tortues à Baradal, Petit Tabac à l'horizon.",'Droits du parc marin à payer, éventuellement en ligne avant l\'arrivée.','Tobago Cays'],
+  ['Jeu. 3','Tobago Cays → Wallilabou','tw',38,"Dernier bain à l'aube, puis on remonte les Grenadines pour arriver en milieu d'après-midi.",'Rien à signaler.','Wallilabou'],
+  ['Ven. 4','Saint-Vincent → Le Marin, de nuit','wm',76,"Jardin botanique et Fort Charlotte à Kingstown, ou Dark View Falls, en gardant quelqu'un à bord. "+REM,'Sortie de Saint-Vincent à Wallilabou, en heures ouvrées, avant de partir.','En mer, quarts de 18 h à 6 h'],
+  ['Sam. 5','Le Marin, restitution','wm',0,FIN,'Clearance d\'entrée au Marin.','Hôtel en Martinique']]},
+ B:{nom:'Le Sillage Jet-Set',sub:'≈ 198 milles, sans les Tobago Cays',desc:"Mêmes traversées de nuit, mais on prend le temps à Bequia et Mustique. À choisir si l'équipage a envie de dîners plus que de milles.",legs:[
+  ['Sam. 28','Le Marin → Wallilabou, de nuit','mw',76,SAM,SAMF,'En mer, quarts de 18 h à 6 h'],
+  ['Dim. 29','Arrivée à Wallilabou','mw',0,"Arrivée au jour, sieste, visite du décor en fin de journée.",'Entrée à Saint-Vincent à Wallilabou, ouverture du dimanche à vérifier.','Wallilabou'],
+  ['Lun. 30','Wallilabou → Bequia','wb',15,"Courte étape, marché et bars d'Admiralty Bay.",'Clearance à finir à Port Elizabeth si besoin.','Admiralty Bay, Bequia'],
+  ['Mar. 1','Bequia → Mustique','bm',8,"Grande tenue, bouée à Britannia Bay, dîner à Basil's Bar.",'Mouillage sur bouée uniquement.','Britannia Bay, Mustique'],
+  ['Mer. 2','Mustique → Bequia','mb',8,"Matinée à Mustique, retour à Bequia pour Princess Margaret Beach et les constructeurs de maquettes.",'Rien à signaler.','Admiralty Bay, Bequia'],
+  ['Jeu. 3','Bequia → Wallilabou','bw',15,"Journée lente à Bequia, puis court saut vers Saint-Vincent.",'Rien à signaler.','Wallilabou'],
+  ['Ven. 4','Saint-Vincent → Le Marin, de nuit','wm',76,"Kingstown ou Dark View Falls. "+REM,'Sortie de Saint-Vincent à Wallilabou, en heures ouvrées, avant de partir.','En mer, quarts de 18 h à 6 h'],
+  ['Sam. 5','Le Marin, restitution','wm',0,FIN,'Clearance d\'entrée au Marin.','Hôtel en Martinique']]},
+ C:{nom:'Repli météo',sub:'≈ 59 milles, Martinique seule',desc:"Si les canaux sont trop forts au moment de partir, on reste à l'abri de la côte sous le vent. Pas de nuit en mer, aucune formalité, et Saint-Pierre au mouillage.",legs:[
+  ['Sam. 28','Le Marin → Anses d\'Arlet','ma',13,"Briefing et pleins, départ en fin de matinée. Passage devant le Rocher du Diamant, salut réglementaire du capitaine.",'Aucune.','Grande Anse d\'Arlet'],
+  ['Dim. 29','Anses d\'Arlet → Saint-Pierre','as',16,"Remontée le long de la côte, à l'abri du relief.",'Aucune.','Saint-Pierre'],
+  ['Lun. 30','Journée à Saint-Pierre','as',0,"Ruines de 1902 et musée.",'Aucune.','Saint-Pierre'],
+  ['Mar. 1','Montagne Pelée ou distillerie','as',0,"Randonnée tôt le matin, ou distillerie Depaz l'après-midi.",'Aucune.','Saint-Pierre'],
+  ['Mer. 2','Saint-Pierre → Trois-Îlets','sm',12,"Descente vers la baie de Fort-de-France.",'Aucune.','Anse Mitan'],
+  ['Jeu. 3','Fort-de-France en vedette','sm',0,"Bibliothèque Schœlcher, marché, jardin de Balata.",'Aucune.','Anse Mitan'],
+  ['Ven. 4','Trois-Îlets → Le Marin','mm',18,"Retour vers le sud, dernière soirée à bord.",'Aucune.','Le Marin'],
+  ['Sam. 5','Le Marin, restitution','mm',0,"Plein de gasoil, état des lieux, restitution, hôtel.",'Aucune.','Hôtel en Martinique']]}
+};
+let cur='A',curLeg=0;
+const hrs=n=>{if(!n)return'';const h=Math.round(n/6.5*2)/2;return(h+'').replace('.',',')+' h'};
+const DEPART={mw:18,wm:17,ma:11,tw:8};
+const RETOUR=['wm','tw','bw','mb','mm'];
+function legsCarte(pl){return pl.legs.map((l,i)=>{const w=W[l[2]];
+ return{date:l[0],titre:l[1],mer:l[3]>0,retour:RETOUR.includes(l[2]),pts:l[3]>0?w:[w[w.length-1]],
+  depart:new Date(Date.UTC(2026,10,28+i,(DEPART[l[2]]??9)+4,0))}})}
+function drawPlan(){
+ const pl=PLANS[cur];
+ $$('#plans button').forEach(b=>{b.classList.toggle('on',b.dataset.p===cur);b.setAttribute('aria-pressed',b.dataset.p===cur)});
+ $('#plan-desc').textContent=pl.desc;
+ $('#legs').innerHTML=pl.legs.map((l,i)=>`<button class="leg-b" data-i="${i}" type="button">
+   <span class="d">${l[0]}</span><h3>${esc(l[1])}</h3><span class="nm">${l[3]||'—'}${l[3]?`<small>milles<br>${hrs(l[3])}</small>`:'<small>à terre</small>'}</span>
+   <span class="x"><span>${esc(l[4])}</span><span><b>Formalités :</b> ${esc(l[5])}</span><span><b>Nuit :</b> ${esc(l[6])}</span></span></button>`).join('');
+ const tot=pl.legs.reduce((s,l)=>s+l[3],0);
+ $('#total').innerHTML=`<span>Total du plan</span><b>${tot} milles · ${Math.round(tot/6.5)} h à 6,5 nœuds</b>`;
+ curLeg=Math.min(curLeg,pl.legs.length-1);
+ Carte.plan(legsCarte(pl),curLeg,selLeg);
+ selLeg(curLeg);
+}
+function selLeg(i){
+ curLeg=i;
+ $$('.leg-b').forEach((b,j)=>{b.classList.toggle('on',j===i);b.setAttribute('aria-expanded',j===i)});
+ Carte.etape(i);
+}
+$('#plans').innerHTML=Object.entries(PLANS).map(([k,p])=>`<button type="button" data-p="${k}">Plan ${k}<small>${esc(p.nom)}</small></button>`).join('');
+$('#plans').addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;cur=b.dataset.p;curLeg=0;drawPlan()});
+$('#legs').addEventListener('click',e=>{const b=e.target.closest('.leg-b');if(b)selLeg(+b.dataset.i)});
+drawPlan();
+
+/* --- escales --- */
+const TERR=[
+ {n:'Martinique',f:[['Statut','Département français, euro, réseau mobile comme en métropole'],['Capitale','Fort-de-France'],['Quand','27-28 nov. et 5-7 déc.'],['Sargasses',"Surtout côte atlantique. La tendance était à la baisse fin août : consulter le bulletin de Météo-France avant de partir."]],l:[
+  ['Rocher du Diamant','À voir depuis la côte',"En 1804, les Britanniques y hissent des canons et l'enregistrent comme navire de guerre : le HMS Diamond Rock. Il tient dix-sept mois contre la flotte française.",'philippe joseph'],
+  ['Saint-Pierre','Ville et mouillage',"L'ancienne capitale, rasée par la montagne Pelée le 8 mai 1902. Les ruines du théâtre et la cellule du prisonnier Cyparis se visitent à pied.",'iris philippe joseph'],
+  ['Montagne Pelée','Randonnée',"Le volcan de 1 397 m, classé à l'Unesco avec les forêts du nord. Départ tôt le matin, sommet souvent dans les nuages.",'max'],
+  ['Jardin de Balata','Jardin',"Trois hectares de plantes tropicales et de ponts suspendus au-dessus de Fort-de-France. Max risque de ne pas en sortir.",'max anastasia'],
+  ['Bibliothèque Schœlcher','Architecture',"Dôme de fer et de verre, présenté à l'Exposition de Paris en 1889, démonté puis remonté à Fort-de-France. Un monument à part pour Iris.",'iris'],
+  ['Habitation Clément','Rhum et art',"Au François : maison de maître, distillerie, parc de sculptures et fondation d'art contemporain.",'anastasia iris philippe'],
+  ['Les fonds blancs','Baignoires de Joséphine',"De l'eau à la taille au milieu de la baie du François, ti-punch à la main. Sortie en bateau à réserver depuis la côte atlantique.",'anastasia joseph'],
+  ['Grande Anse des Salines','Plage',"La grande plage du sud, à garder pour le dimanche 6 décembre.",'anastasia max']]},
+ {n:'Saint-Vincent',f:[['Pays',"Saint-Vincent-et-les-Grenadines, État indépendant"],['Capitale','Kingstown'],['Monnaie','Dollar des Caraïbes orientales, 1 US$ = 2,70 EC$'],['Langue','Anglais'],['Téléphone','Hors forfait UE. Indicatif +1 784'],['Quand','29-30 nov. et 3-4 déc.']],l:[
+  ['Wallilabou','Mouillage',"La baie a servi de Port Royal dans le premier film Pirates des Caraïbes. Il reste quelques décors vieillissants, plus touchants qu'impressionnants, et un poste de douane. Amarre à terre, annexe cadenassée.",'joseph philippe'],
+  ['Dark View Falls','Excursion',"Deux cascades dans la jungle, au nord de la côte sous le vent, accessibles par un pont de bambou. À faire en taxi depuis Wallilabou.",'max joseph'],
+  ['Jardin botanique de Kingstown','Jardin',"Fondé en 1765, parmi les plus anciens de l'hémisphère occidental. Il abrite un arbre à pain descendant de ceux du capitaine Bligh.",'max philippe'],
+  ['Fort Charlotte','Fortification',"Sur sa colline au-dessus de Kingstown, avec ses canons tournés vers la terre. Belle vue jusqu'aux Grenadines, et une leçon pour Iris.",'iris philippe'],
+  ['La Soufrière','Randonnée, si le temps le permet',"Le volcan de 1 234 m, dernière éruption en 2021. Une journée complète : à garder pour un équipage qui ne craint pas de quitter le bateau.",'max']]},
+ {n:'Grenadines',f:[['Pays','Même pays que Saint-Vincent'],['Monnaie','EC$, US$ souvent acceptés, prévoir du liquide'],['Fonds','Récifs et hauts-fonds : navigation à vue, soleil haut'],['Après Beryl',"Ouragan de juillet 2024. Mayreau et Canouan sont signalés remis. Union Island a été la plus lente à repartir : pas d'escale prévue."],['Quand','30 nov. au 3 déc.']],l:[
+  ['Bequia','Mouillage et ravitaillement',"Admiralty Bay, Port Elizabeth, ses marchés, ses bars les pieds dans l'eau. Île de marins et de constructeurs de maquettes de bateaux.",'philippe anastasia iris'],
+  ['Princess Margaret Beach','Plage',"La plage la plus connue de Bequia, à portée d'annexe de la baie.",'anastasia max'],
+  ['Mustique','Mouillage sur bouée',"L'île privée de la jet-set depuis Princess Margaret. Les visiteurs doivent rester sur les bouées de Britannia Bay et les plages sont en grande partie réservées. On y vient pour Basil's Bar, en tenue.",'anastasia philippe'],
+  ['Tobago Cays','Lagon protégé',"Quatre îlots inhabités derrière Horseshoe Reef. Tortues à Baradal, eau turquoise, bateaux de vendeurs de langoustes. Le sommet du voyage, au plan A seulement.",'max joseph anastasia'],
+  ['Petit Tabac','À voir depuis le lagon',"Le petit îlot de sable et de palmiers où le capitaine du film se retrouve abandonné. Joseph en sortira une bande-annonce.",'joseph'],
+  ['Mayreau','Option, Salt Whistle Bay',"Une petite baie en croissant, remise en état après Beryl. Bon mouillage de secours près des Cays.",'iris max']]}
+];
+const flt=[['tous','Tout l\'équipage'],...CREW.map(c=>[c.id,c.nom.replace('Capitaine ','').split(' ')[0]])];
+$('#filtre').innerHTML=flt.map(([k,t],i)=>`<button type="button" data-c="${k}" class="${i?'':'on'}">${esc(t)}</button>`).join('');
+$('#terr').innerHTML=TERR.map(t=>`<div class="terr"><div><h2>${t.n}</h2><dl>${t.f.map(([a,b])=>`<div><dt>${esc(a)}</dt><dd>${esc(b)}</dd></div>`).join('')}</dl></div>
+ <div class="lieux">${t.l.map(l=>`<article class="lieu" data-c="${l[3]}"><h3>${esc(l[0])}</h3><span class="w">${esc(l[1])}</span><p>${esc(l[2])}</p></article>`).join('')}</div></div>`).join('');
+$('#filtre').addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;
+ $$('#filtre button').forEach(x=>x.classList.toggle('on',x===b));const c=b.dataset.c;
+ $$('.lieu').forEach(l=>l.classList.toggle('off',c!=='tous'&&!l.dataset.c.split(' ').includes(c)))});
+
+/* --- préparatifs --- */
+const H=[['13:40','Atterrissage à Fort-de-France. Bagages, café, premier soleil.'],['14:30','Transfert en van vers Le Marin. Compter environ une heure, plus le vendredi après-midi.'],['15:30','Courses : Carrefour Market à Montgérald en voiture, ou Auchan Mondésir à pied depuis la marina. Livraison à bord à demander à la base.'],['17:30','Bagages à la base, frais au frigo.'],['18:00','Embarquement, heure à confirmer avec Star Voyage. Installation des cabines, cartons laissés à quai.'],['20:00','Dîner au Marin. La première tournée est pour le capitaine.']];
+$('#heures').innerHTML=H.map(([a,b])=>`<li><b>${a}</b><span>${esc(b)}</span></li>`).join('');
+const LISTES=[
+ {t:'Avant de quitter Paris',s:'À boucler cette semaine ou la suivante.',i:[
+  ['Passeports valides pour les 5'],['Anastasia : passeport et titre de séjour français valides, à emporter tous les deux'],['Vérifier l\'entrée à Saint-Vincent pour le passeport d\'Anastasia','Consulat'],
+  ['Star Voyage : accord pour naviguer jusqu\'à Saint-Vincent'],['Star Voyage : navigation de nuit autorisée par le contrat'],['Star Voyage : cruising licence et papiers pour la douane SVG'],['Star Voyage : heures d\'embarquement et de restitution'],['Star Voyage : montant et mode de caution'],
+  ['CV nautique du capitaine envoyé'],['Liste d\'équipage avec numéros de passeport'],['Assurance voyage et rachat de franchise'],['Hôtel réservé pour les 5 et 6 décembre'],['Van réservé aéroport → Le Marin'],['Louer un Starlink : couverture SVG et mer, alimentation 12 V','Joseph ?'],['Forfaits téléphone hors UE vérifiés, ou eSIM Saint-Vincent'],
+  ['Espèces : EC$ ou US$ pour bouées, boat boys et bars'],['Sacs souples uniquement, pas de valises rigides'],['Tenue de soirée pour Mustique','Anastasia veille'],['Caméra, cartes mémoire, housse étanche','Joseph']]},
+ {t:'Boissons',s:'Cinq personnes, trois jours.',i:[['Eau plate 1,5 L','24'],['Eau gazeuse 1,5 L','6'],['Jus de fruits 1 L','4'],['Bières','24'],['Rhum agricole','2'],['Sirop de canne','1'],['Citrons verts','15'],['Champagne','3'],['Vin','4'],['Café, filtres, thé',''],['Thermos','2'],['Sacs de glaçons','2']]},
+ {t:'Petits-déjeuners et frais',s:'',i:[['Pain de mie','2'],['Beurre','2'],['Confiture et miel','2'],['Œufs','18'],['Yaourts','15'],['Lait UHT 1 L','3'],['Bananes','1 régime'],['Ananas','2'],['Mangues','5']]},
+ {t:'Déjeuners en mer',s:'Froids et faciles, surtout dimanche.',i:[['Tomates','1,5 kg'],['Concombres','3'],['Avocats','5'],['Salades','3'],['Riz','1 kg'],['Pâtes','1 kg'],['Thon en boîte','6'],['Feta','2'],['Jambon','400 g'],['Fromage à pâte dure','500 g'],['Wraps','2 paquets']]},
+ {t:'Dîners et apéritifs',s:'',i:[['Poisson frais ou poulet mariné','1,5 kg'],['Patates douces','1,5 kg'],['Sauce tomate','3'],['Oignons et ail',''],['Huile, vinaigre, sel, poivre',''],['Épices et piment',''],['Charbon si barbecue à charbon','Vérifier'],['Chips et cacahuètes','6'],['Olives','2'],['En-cas pour les quarts','2 sachets']]},
+ {t:'Cambuse et santé',s:'',i:[['Essuie-tout','4'],['Papier toilette','12'],['Sacs poubelle',''],['Liquide vaisselle et éponges',''],['Allumettes',''],['Crème solaire minérale','3'],['Répulsif moustiques','2'],['Comprimés contre le mal de mer','1 boîte'],['Pansements, antiseptique',''],['Piles',''],['Lampes frontales à lumière rouge','5'],]},
+ {t:'Avant de larguer, samedi matin',s:'Avec la base puis entre nous.',i:[['Inventaire complet avec la base'],['Essai des deux moteurs, annexe et hors-bord'],['Essai du guindeau et de l\'ancre'],['Essai VHF, GPS, pilote, feux de navigation'],['Starlink installé et testé au ponton','Joseph'],['Niveaux : gasoil 400 L, eau 600 L, gaz'],['Gilets, harnais, longes, fusées, trousse de secours'],['Tableau des quarts affiché','Philippe'],['Prises de ris répétées avec tout l\'équipage','Philippe'],['Annexe : cadenas et chaîne','Max'],['Clearance de sortie au Marin','Iris'],['Papiers du bateau et liste d\'équipage à bord','Iris'],['Bulletin météo des canaux relevé','Philippe']]},
+ {t:'Ravitaillement à Bequia',s:'Lundi 30, Admiralty Bay.',i:[['Pain, fruits, légumes'],['Glace'],['Eau'],['Poisson ou langouste'],['EC$ retirés si besoin'],['Complément de boissons pour les Tobago Cays']]}
+];
+const slug=s=>s.normalize('NFD').replace(/[̀-ͯ]/g,'').toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'').slice(0,48);
+$('#listes').innerHTML=LISTES.map(g=>{const pre=slug(g.t).slice(0,10);
+ return`<div class="liste"><h3>${esc(g.t)}<span class="prog"></span></h3>${g.s?`<p class="sub">${esc(g.s)}</p>`:''}${g.i.map(it=>{const id=pre+'-'+slug(it[0]);
+ return`<label class="ck"><input type="checkbox" id="${id}" data-k="${id}"><span>${esc(it[0])}</span>${it[1]?`<em>${esc(it[1])}</em>`:''}</label>`}).join('')}</div>`}).join('');
+let etat={};
+try{etat=JSON.parse(localStorage.getItem('fc-coches')||'{}')}catch(e){}
+function paint(){
+ $$('.ck input').forEach(c=>{c.checked=!!etat[c.dataset.k]});
+ $$('.liste').forEach(g=>{const b=$$('input',g);$('.prog',g).textContent=b.filter(x=>x.checked).length+'/'+b.length});
+}
+paint();
+document.addEventListener('change',e=>{
+ const c=e.target.closest('.ck input');if(!c)return;
+ etat[c.dataset.k]=c.checked;paint();
+ try{localStorage.setItem('fc-coches',JSON.stringify(etat))}catch(e){}
+});
+
+/* --- démarrage --- */
+let start='pont';const h=(location.hash||'').slice(1);
+if(VIEWS.includes(h))start=h;else{try{const s=localStorage.getItem('fc-vue');if(VIEWS.includes(s))start=s}catch(e){}}
+show(start);
+</script>
+</body>
+</html>
