@@ -141,8 +141,8 @@ section+section{margin-top:56px}
 .avert{position:absolute;left:50%;top:10px;transform:translateX(-50%);z-index:500;background:#07141cd9;color:var(--brume);font-size:12px;padding:5px 10px;border-radius:2px;pointer-events:none;white-space:nowrap}
 #reticule{position:absolute;left:50%;top:50%;width:34px;height:34px;margin:-17px 0 0 -17px;z-index:500;pointer-events:none;background:linear-gradient(var(--laiton),var(--laiton)) center/2px 100% no-repeat,linear-gradient(var(--laiton),var(--laiton)) center/100% 2px no-repeat;opacity:.85}
 .panneau{display:flex;flex-direction:column;min-height:0;border-left:1px solid var(--laiton2)}
-.ongs{display:grid;grid-template-columns:repeat(4,1fr);border-bottom:1px solid var(--laiton2);flex:none}
-.ong{background:none;border:0;border-bottom:2px solid transparent;color:var(--brume);font:500 12px/1 var(--body);letter-spacing:.1em;text-transform:uppercase;padding:14px 4px 12px;cursor:pointer}
+.ongs{display:grid;grid-template-columns:repeat(5,1fr);border-bottom:1px solid var(--laiton2);flex:none}
+.ong{background:none;border:0;border-bottom:2px solid transparent;color:var(--brume);font:500 11.5px/1 var(--body);letter-spacing:.06em;text-transform:uppercase;padding:14px 4px 12px;cursor:pointer}
 .ong.on{color:var(--laiton);border-color:var(--laiton)}
 .pan{overflow-y:auto;padding:16px 16px 22px;flex:1;min-height:0;font-size:15px}
 .pan h4{font:500 12px/1.2 var(--body);letter-spacing:.12em;text-transform:uppercase;color:var(--laiton);margin:18px 0 8px}
@@ -213,6 +213,72 @@ section+section{margin-top:56px}
 .ico-bateau path{fill:var(--corail);stroke:#fff;stroke-width:1.5}
 .mes-lab{background:#07141ce0;color:#f2c94c;font:600 12px var(--body);padding:3px 6px;border-radius:2px;white-space:nowrap;transform:translate(-50%,-50%);width:max-content!important}
 html.mode-nuit::after{content:"";position:fixed;inset:0;background:#b30000;mix-blend-mode:multiply;pointer-events:none;z-index:99999}
+.btn:disabled{opacity:.5;cursor:wait}
+.barre{height:6px;background:var(--laque2);border-radius:3px;overflow:hidden;margin:10px 0 6px}
+.barre i{display:block;height:100%;background:#b388ff;transition:width .2s}
+#routage .btn{margin-bottom:8px}
+.rt-res p{margin-top:8px}
+.rt-t{font-size:13px;margin-top:8px}
+.rt-t th{font-size:10.5px;padding:6px 8px 6px 0}
+.rt-t td{padding:6px 8px 6px 0}
+.rt-t small{color:var(--brume)}
+.alerte-i{color:#ffb4a3;font-weight:500}
+.ais-cadre{background:var(--nuit);min-height:120px;border:1px solid var(--laque2)}
+.btn-compas{width:34px;height:34px;padding:5px;background:var(--laque);border:1px solid var(--laiton2)!important;cursor:pointer;display:block}
+.btn-compas svg{width:100%;height:100%;fill:none;stroke:var(--laiton);stroke-width:1.6}
+.btn-compas svg path{fill:var(--corail);stroke:none}
+body.ins-ouvert{overflow:hidden}
+#instruments{position:fixed;inset:0;z-index:2000;background:var(--nuit);color:var(--ecume);display:flex;flex-direction:column;padding:max(10px,env(safe-area-inset-top)) max(14px,env(safe-area-inset-right)) max(10px,env(safe-area-inset-bottom)) max(14px,env(safe-area-inset-left));overflow-y:auto}
+#instruments[hidden]{display:none}
+.ins-h{display:flex;justify-content:space-between;align-items:center;gap:10px;flex:none}
+.ins-b{background:none;border:1px solid var(--laiton2);color:var(--ecume);font:500 14px var(--body);padding:9px 12px;border-radius:2px;cursor:pointer}
+.ins-b[aria-pressed="true"]{background:var(--laiton);color:#14222a}
+.ins-src{font-size:13px;color:var(--brume);text-align:center}
+.ins-c{flex:1;display:grid;grid-template-columns:minmax(0,1.1fr) minmax(0,1fr);gap:18px;align-items:center;max-width:1100px;width:100%;margin:0 auto}
+.ins-rose{display:grid;justify-items:center;gap:10px}
+.rose{width:min(100%,62vh,560px);height:auto;display:block}
+.rose .fond{fill:var(--laque);stroke:var(--laiton2);stroke-width:1.5}
+.rose .gr{stroke:var(--brume);stroke-width:1.2}.rose .gr.f{stroke:var(--ecume);stroke-width:2}
+.rose text{fill:var(--ecume);text-anchor:middle;dominant-baseline:middle}
+.rose .card{font:600 22px var(--body);fill:var(--laiton)}
+.rose .deg{font:500 14px var(--body)}
+.rose .lubber{fill:var(--corail)}
+.rose .bateau-c{fill:none;stroke:var(--ecume);stroke-width:2;opacity:.8}
+.rose .cap-txt{font:500 30px var(--disp);fill:var(--ecume)}
+.rose #ins-rose{transition:transform .25s linear}
+.mk-vent path{fill:#5aa9ff}.mk-vent line{stroke:#5aa9ff;stroke-width:2;stroke-dasharray:4 4}
+.mk-cog path{fill:var(--corail)}
+.mk-cible circle{fill:var(--laiton);stroke:var(--nuit);stroke-width:2}
+.ins-g{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.ins-v{background:var(--laque);border:1px solid var(--laque2);padding:10px 12px;display:grid;gap:2px;min-width:0}
+.ins-v.large{grid-column:1/3}
+.ins-v span{font:500 11px/1 var(--body);letter-spacing:.12em;text-transform:uppercase;color:var(--laiton)}
+.ins-v b{font:500 34px/1.1 var(--disp);font-variant-numeric:lining-nums tabular-nums}
+.ins-v b small{font:400 14px var(--body);color:var(--brume)}
+.ins-v b.pos{font:500 19px/1.3 var(--body)}
+.ins-v>small{font-size:13px;color:var(--brume)}
+.ins-note{font-size:12.5px;color:var(--brume);text-align:center;max-width:760px;margin:10px auto 0;flex:none}
+.ins-note i{display:inline-block;width:10px;height:10px;border-radius:50%;vertical-align:-1px;margin:0 2px}
+.k-cible{background:var(--laiton)}.k-cog{background:var(--corail)}.k-vent{background:#5aa9ff}
+.mt-prog{font-size:15px;min-width:760px}
+.mt-prog td{vertical-align:middle}
+.mt-prog tr.mer td{background:#ef6a4c12}
+.mt-prog tr.passe td{opacity:.45}
+.mt-prog .jour{font:500 13px/1.2 var(--body);letter-spacing:.06em;text-transform:uppercase;color:var(--laiton);white-space:nowrap}
+.mt-prog .lieu{font:italic 500 18px/1.15 var(--disp)}
+.mt-prog .tend{font-size:11px;color:var(--brume);display:block}
+.ciel{font-size:22px;line-height:1}
+.mt-carte{border-top:1px solid var(--laiton2);padding-top:16px;margin-top:26px}
+.mt-carte h3{font:italic 500 26px/1.1 var(--disp)}
+.mt-carte .sous{font-size:14px;color:var(--brume);margin:4px 0 10px}
+.bande{display:grid;grid-auto-flow:column;grid-auto-columns:minmax(78px,1fr);gap:4px;overflow-x:auto;padding-bottom:6px;scrollbar-width:thin}
+.jr{background:var(--laque);padding:8px 6px;text-align:center;font-size:13px;display:grid;gap:3px;border-top:3px solid transparent}
+.jr.sejour{border-top-color:var(--laiton);background:var(--laque2)}
+.jr.tendance{opacity:.6}
+.jr .d{font:500 11px/1.2 var(--body);letter-spacing:.06em;text-transform:uppercase;color:var(--brume)}
+.jr .v{font-weight:600}
+.jr .h{color:var(--lagon)}
+.jr .p{color:var(--brume);font-size:12px}
 .legs{display:grid;gap:0;min-width:0}
 .leg-b{display:grid;grid-template-columns:82px minmax(0,1fr) 58px;gap:4px 14px;background:none;border:0;border-top:1px solid var(--laque2);color:inherit;font:inherit;text-align:left;padding:13px 6px;cursor:pointer;width:100%}
 .leg-b:hover{background:var(--laque)}
@@ -278,6 +344,9 @@ footer{border-top:1px solid var(--laiton2);padding-block:22px;text-align:center;
 
 @media (max-width:860px){
   .station{grid-template-columns:minmax(0,1fr);height:auto;min-height:0}
+  .ins-c{grid-template-columns:minmax(0,1fr)}
+  .rose{width:min(100%,46vh)}
+  .ins-v b{font-size:28px}
   .carte-w{height:64vh;height:64dvh}
   .panneau{border-left:0;border-top:1px solid var(--laiton2)}
   .pan{max-height:none;overflow:visible}
@@ -294,6 +363,15 @@ footer{border-top:1px solid var(--laiton2);padding-block:22px;text-align:center;
   .stub .n{font-size:38px}
   .leg-b{grid-template-columns:62px minmax(0,1fr) 50px;gap:4px 10px}
   .leg-b .x{grid-column:1/4}
+  .mt-prog{min-width:0;font-size:14.5px}
+  .mt-prog thead{display:none}
+  .mt-prog tr{display:grid;grid-template-columns:30px minmax(0,1fr) minmax(0,1fr) minmax(0,1fr);gap:6px 8px;padding:12px 0;border-bottom:1px solid var(--laque2)}
+  .mt-prog td{border:0;padding:0}
+  .mt-prog td:nth-child(1){grid-column:1/4;grid-row:1}
+  .mt-prog td:nth-child(7){grid-column:4;grid-row:1;justify-self:end}
+  .mt-prog td:nth-child(2){grid-column:1/5}
+  .mt-prog .tend{display:inline;margin-left:6px}
+  .mt-prog tr.mer{background:#ef6a4c12}.mt-prog tr.mer td{background:none}
   .avert{left:54px;right:54px;transform:none;white-space:normal;text-align:center;font-size:11px}
   .leaflet-control-attribution{font-size:9.5px;line-height:1.3;max-width:62%}
   .coord{bottom:44px}
@@ -308,6 +386,7 @@ footer{border-top:1px solid var(--laiton2);padding-block:22px;text-align:center;
   <a href="#equipage" data-v="equipage">L'Équipage</a>
   <a href="#route" data-v="route">La Route</a>
   <a href="#escales" data-v="escales">Les Escales</a>
+  <a href="#meteo" data-v="meteo">La Météo</a>
   <a href="#preparatifs" data-v="preparatifs">Les Préparatifs</a>
 </div></nav>
 
@@ -453,8 +532,9 @@ footer{border-top:1px solid var(--laiton2);padding-block:22px;text-align:center;
       <aside class="panneau" aria-label="Outils de la carte">
         <div class="ongs" role="tablist">
           <button type="button" class="ong on" role="tab" data-o="etapes" aria-selected="true">Étapes</button>
-          <button type="button" class="ong" role="tab" data-o="mouillages" aria-selected="false">Mouillages</button>
+          <button type="button" class="ong" role="tab" data-o="mouillages" aria-selected="false">Ancres</button>
           <button type="button" class="ong" role="tab" data-o="meteo" aria-selected="false">Météo</button>
+          <button type="button" class="ong" role="tab" data-o="bateaux" aria-selected="false">Bateaux</button>
           <button type="button" class="ong" role="tab" data-o="outils" aria-selected="false">Outils</button>
         </div>
         <div class="pan" data-o="etapes">
@@ -464,6 +544,7 @@ footer{border-top:1px solid var(--laiton2);padding-block:22px;text-align:center;
           <div class="total" id="total"></div>
           <h4>Heure d'arrivée de l'étape</h4>
           <div id="eta"></div>
+          <div id="routage"></div>
         </div>
         <div class="pan" data-o="mouillages" hidden>
           <div id="fiche"><p class="muted" style="margin-bottom:12px">Touche une ancre sur la carte ou un nom ci-dessous. Sa couleur dit l'abri à l'heure choisie dans l'onglet Météo : <b style="color:#5fd39a">bon</b>, <b style="color:#e3a33a">moyen</b>, <b style="color:#ff7b8c">exposé</b>, <b style="color:#b79be0">secours seulement</b> (Sainte-Lucie, clearance obligatoire).</p></div>
@@ -491,8 +572,19 @@ footer{border-top:1px solid var(--laiton2);padding-block:22px;text-align:center;
             <li><a href="https://www.windy.com/?13.6,-61.2,8" target="_blank" rel="noopener">Windy, zone de navigation</a></li>
           </ul>
         </div>
+        <div class="pan" data-o="bateaux" hidden>
+          <p class="muted" style="margin-bottom:10px">Bateaux équipés d'AIS vus par les stations à terre (VesselFinder). La couverture est inégale aux Grenadines et les positions ont parfois quelques minutes de retard : en navigation, l'AIS et le radar du bord font foi.</p>
+          <div class="eta-g">
+            <label>Centrer sur<select id="ais-centre"><option value="carte">la vue de la carte</option><option value="gps">ma position GPS</option><option value="etape">l'arrivée de l'étape</option></select></label>
+            <label>Zoom<select id="ais-zoom"><option value="9">large (canaux)</option><option value="11" selected>moyen</option><option value="13">proche (mouillage)</option></select></label>
+          </div>
+          <button type="button" class="btn" id="ais-maj" style="margin-bottom:10px">Actualiser la carte AIS</button>
+          <div id="ais-cadre" class="ais-cadre"></div>
+          <p id="ais-liens" class="muted" style="margin-top:8px"></p>
+        </div>
         <div class="pan" data-o="outils" hidden>
           <div class="btns">
+            <button type="button" class="btn" id="btn-compas2">Compas et instruments (plein écran)</button>
             <button type="button" class="btn" id="btn-pos">Afficher ma position</button>
             <p id="pos-res" class="muted"></p>
             <button type="button" class="btn" id="btn-mesure">Mesurer distance et cap</button>
@@ -600,6 +692,29 @@ footer{border-top:1px solid var(--laiton2);padding-block:22px;text-align:center;
   </div>
 </div>
 
+<!-- ================= MÉTÉO ================= -->
+<div class="view" id="v-meteo" hidden>
+  <div class="wrap">
+    <header class="vh">
+      <div class="eyebrow">Bulletin du bord</div>
+      <h1>La météo des escales</h1>
+      <p>Prévisions sur seize jours pour chaque mouillage du voyage et pour les deux canaux traversés de nuit. Au-delà d'une semaine, ce ne sont que des tendances : on refait le point chaque matin avec le bulletin de Météo-France.</p>
+    </header>
+    <div class="plans" id="mt-plans" role="group" aria-label="Plan de navigation affiché"></div>
+    <p id="mt-etat" class="muted" style="margin-bottom:22px"></p>
+    <section>
+      <h2 class="s">Jour par jour</h2>
+      <div class="scroll"><table class="mt-prog" id="mt-prog"></table></div>
+      <p class="muted" style="margin-top:10px">Abri de nuit : vent et houle prévus à 22 h, comparés aux secteurs exposés du mouillage. Alerte de traversée au-delà de 25 nœuds de rafales ou 2,5 m de houle dans un canal.</p>
+    </section>
+    <section style="margin-top:48px">
+      <h2 class="s">Par escale, sur seize jours</h2>
+      <div id="mt-lieux"></div>
+    </section>
+    <p class="sources" style="margin-top:36px">Données Open-Meteo (modèles Météo-France, ECMWF et GFS, vagues MeteoFrance Wave). Bulletins officiels : <a href="https://meteofrance.mq/fr/marine" target="_blank" rel="noopener">Météo-France Antilles</a>, <a href="https://www.nhc.noaa.gov/" target="_blank" rel="noopener">NHC</a>.</p>
+  </div>
+</div>
+
 <!-- ================= PRÉPARATIFS ================= -->
 <div class="view" id="v-preparatifs" hidden>
   <div class="wrap">
@@ -655,17 +770,20 @@ footer{border-top:1px solid var(--laiton2);padding-block:22px;text-align:center;
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
 <script src="carte.js"></script>
+<script src="routage.js"></script>
+<script src="instruments.js"></script>
 <script>
 const $=(s,r=document)=>r.querySelector(s), $$=(s,r=document)=>[...r.querySelectorAll(s)];
 const esc=s=>String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;');
 
 /* --- vues --- */
-const VIEWS=['pont','equipage','route','escales','preparatifs'];
+const VIEWS=['pont','equipage','route','escales','meteo','preparatifs'];
 function show(v,scroll){
   if(!VIEWS.includes(v))v='pont';
   VIEWS.forEach(x=>{$('#v-'+x).hidden=x!==v});
   $$('nav.top a').forEach(a=>{const on=a.dataset.v===v;a.classList.toggle('on',on);on?a.setAttribute('aria-current','page'):a.removeAttribute('aria-current')});
   if(v==='route')Carte.visible();
+  if(v==='meteo'&&window.MeteoEscales)MeteoEscales.visible();
   if(scroll)window.scrollTo(0,0);
   try{localStorage.setItem('fc-vue',v)}catch(e){}
 }
@@ -797,7 +915,9 @@ function selLeg(i){
  Carte.etape(i);
 }
 $('#plans').innerHTML=Object.entries(PLANS).map(([k,p])=>`<button type="button" data-p="${k}">Plan ${k}<small>${esc(p.nom)}</small></button>`).join('');
-$('#plans').addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;cur=b.dataset.p;curLeg=0;drawPlan()});
+function choisirPlan(k){if(!PLANS[k])return;cur=k;curLeg=0;drawPlan();try{localStorage.setItem('fc-plan',k)}catch(e){}document.dispatchEvent(new CustomEvent('nav:plan',{detail:k}))}
+try{const k=localStorage.getItem('fc-plan');if(PLANS[k])cur=k}catch(e){}
+$('#plans').addEventListener('click',e=>{const b=e.target.closest('button');if(b)choisirPlan(b.dataset.p)});
 $('#legs').addEventListener('click',e=>{const b=e.target.closest('.leg-b');if(b)selLeg(+b.dataset.i)});
 drawPlan();
 
@@ -873,5 +993,7 @@ let start='pont';const h=(location.hash||'').slice(1);
 if(VIEWS.includes(h))start=h;else{try{const s=localStorage.getItem('fc-vue');if(VIEWS.includes(s))start=s}catch(e){}}
 show(start);
 </script>
+<script src="meteo.js"></script>
+<script>if(location.hash==='#meteo'||document.querySelector('#v-meteo:not([hidden])'))MeteoEscales.visible()</script>
 </body>
 </html>

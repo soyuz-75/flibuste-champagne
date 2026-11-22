@@ -94,12 +94,12 @@
     const etat = $('#wx-etat');
     const la = [], lo = [];
     for (let i = 0; i < G.nla; i++) for (let j = 0; j < G.nlo; j++) { la.push((G.lat0 + i * G.dlat).toFixed(2)); lo.push((G.lon0 + j * G.dlon).toFixed(2)); }
-    const q = `latitude=${la.join(',')}&longitude=${lo.join(',')}&forecast_days=4&timezone=${encodeURIComponent(TZ)}`;
+    const q = `latitude=${la.join(',')}&longitude=${lo.join(',')}&timezone=${encodeURIComponent(TZ)}`;
     etat.textContent = 'Chargement de la météo…';
     try {
       const [f, m] = await Promise.all([
-        fetch(`https://api.open-meteo.com/v1/forecast?${q}&hourly=wind_speed_10m,wind_direction_10m,wind_gusts_10m&wind_speed_unit=kn`).then(r => { if (!r.ok) throw new Error(r.status); return r.json(); }),
-        fetch(`https://marine-api.open-meteo.com/v1/marine?${q}&hourly=wave_height,wave_direction,ocean_current_velocity,ocean_current_direction`).then(r => { if (!r.ok) throw new Error(r.status); return r.json(); })
+        fetch(`https://api.open-meteo.com/v1/forecast?${q}&forecast_days=10&hourly=wind_speed_10m,wind_direction_10m,wind_gusts_10m&wind_speed_unit=kn`).then(r => { if (!r.ok) throw new Error(r.status); return r.json(); }),
+        fetch(`https://marine-api.open-meteo.com/v1/marine?${q}&forecast_days=8&hourly=wave_height,wave_direction,ocean_current_velocity,ocean_current_direction`).then(r => { if (!r.ok) throw new Error(r.status); return r.json(); })
       ]);
       const brut = { f: f.map(x => x.hourly), m: m.map(x => x.hourly), maj: Date.now() };
       try { localStorage.setItem('fc-meteo', JSON.stringify(brut)); } catch (e) { /* stockage plein : tant pis */ }
@@ -125,8 +125,8 @@
         const s = f.wind_speed_10m[t], d = f.wind_direction_10m[t];
         if (s != null && d != null) { const a = (d + 180) * R; W.U[i] = s * Math.sin(a); W.V[i] = s * Math.cos(a); }
         if (f.wind_gusts_10m[t] != null) W.RAF[i] = f.wind_gusts_10m[t];
-        if (m && m.wave_height && m.wave_height[t] != null) { W.HS[i] = m.wave_height[t]; W.HD[i] = m.wave_direction[t]; }
-        if (m && m.ocean_current_velocity && m.ocean_current_velocity[t] != null) {
+        if (m && m.wave_height && m.wave_height[t] != null && m.wave_direction[t] != null) { W.HS[i] = m.wave_height[t]; W.HD[i] = m.wave_direction[t]; }
+        if (m && m.ocean_current_velocity && m.ocean_current_velocity[t] != null && m.ocean_current_direction[t] != null) {
           const c = m.ocean_current_velocity[t] / 1.852, a = m.ocean_current_direction[t] * R; // direction vers laquelle porte le courant
           W.CU[i] = c * Math.sin(a); W.CV[i] = c * Math.cos(a);
         }
@@ -137,11 +137,12 @@
     let t0 = W.heures.findIndex(d => d.getTime() + 3600e3 > now);
     if (t0 < 0) t0 = 0;
     W.t0 = t0; W.t = t0; W.pret = true;
-    const sl = $('#wx-temps'); sl.min = t0; sl.max = Math.min(nt - 1, t0 + 72); sl.value = t0;
+    const sl = $('#wx-temps'); sl.min = t0; sl.max = Math.min(nt - 1, t0 + 168); sl.value = t0;
     $('#wx-etat').innerHTML = depuisCache
       ? `Hors ligne : prévision du ${jourHeure(W.maj)}. <button type="button" class="lien-btn" id="wx-retry">Actualiser</button>`
       : `Prévision Open-Meteo chargée à ${heure(W.maj)}. <button type="button" class="lien-btn" id="wx-retry">Actualiser</button>`;
     majTemps();
+    document.dispatchEvent(new CustomEvent('nav:meteo'));
   }
 
   function interp(arr, t, lat, lon) {
@@ -416,31 +417,75 @@
     $('#mesure-res').innerHTML = p.length > 1 ? `Total : <b>${tot.toFixed(1).replace('.', ',')} milles</b>, soit ${(tot / etaPrefs.vitesse).toFixed(1).replace('.', ',')} h à ${String(etaPrefs.vitesse).replace('.', ',')} nœuds.` : 'Pose le point suivant.';
   }
 
-  let suivi = null, derniere = null;
+  /* GPS partagé : la carte et le compas écoutent le même suivi (événement nav:pos) */
+  const GPS = { suivi: null, derniere: null, pos: null, demandeurs: new Set() };
+  function gpsDemarrer(qui) {
+    GPS.demandeurs.add(qui);
+    if (GPS.suivi != null) return true;
+    if (!navigator.geolocation) return false;
+    GPS.suivi = navigator.geolocation.watchPosition(p => {
+      const ll = [p.coords.latitude, p.coords.longitude], der = GPS.derniere;
+      let cog = p.coords.heading, sog = p.coords.speed != null ? p.coords.speed * 1.94384 : null;
+      if ((cog == null || Number.isNaN(cog)) && der && milles(der.ll, ll) > 0.005) cog = cap(der.ll, ll);
+      if (sog == null && der && p.timestamp > der.t) sog = milles(der.ll, ll) / ((p.timestamp - der.t) / 3600e3);
+      if (cog != null && Number.isNaN(cog)) cog = null;
+      if (sog != null && !isFinite(sog)) sog = null;
+      GPS.derniere = { ll, t: p.timestamp };
+      GPS.pos = { ll, cog, sog, prec: p.coords.accuracy, t: p.timestamp };
+      document.dispatchEvent(new CustomEvent('nav:pos', { detail: GPS.pos }));
+    }, e => document.dispatchEvent(new CustomEvent('nav:pos-err', { detail: e.code })),
+    { enableHighAccuracy: true, maximumAge: 3000, timeout: 30000 });
+    return true;
+  }
+  function gpsArreter(qui) {
+    GPS.demandeurs.delete(qui);
+    if (GPS.demandeurs.size || GPS.suivi == null) return;
+    navigator.geolocation.clearWatch(GPS.suivi); GPS.suivi = null; GPS.pos = null; GPS.derniere = null;
+  }
+  let carteSuit = false, premiere = true;
   function position() {
     const res = $('#pos-res');
-    if (suivi != null) { navigator.geolocation.clearWatch(suivi); suivi = null; $('#btn-pos').textContent = 'Afficher ma position'; res.textContent = ''; if (bateau) { bateau.remove(); bateau = null; } return; }
-    if (!navigator.geolocation) { res.textContent = 'La géolocalisation n\'est pas disponible sur cet appareil.'; return; }
+    if (carteSuit) {
+      carteSuit = false; gpsArreter('carte'); $('#btn-pos').textContent = 'Afficher ma position'; res.textContent = '';
+      if (bateau) { bateau.remove(); bateau = null; } return;
+    }
+    if (!gpsDemarrer('carte')) { res.textContent = 'La géolocalisation n\'est pas disponible sur cet appareil.'; return; }
+    carteSuit = true; premiere = true;
     res.textContent = 'Recherche du GPS…';
     $('#btn-pos').textContent = 'Arrêter le suivi';
-    let premiere = true;
-    suivi = navigator.geolocation.watchPosition(p => {
-      const ll = [p.coords.latitude, p.coords.longitude];
-      let cog = p.coords.heading, sog = p.coords.speed != null ? p.coords.speed * 1.94384 : null;
-      if ((cog == null || Number.isNaN(cog)) && derniere && milles(derniere.ll, ll) > 0.005) cog = cap(derniere.ll, ll);
-      if (sog == null && derniere) sog = milles(derniere.ll, ll) / ((p.timestamp - derniere.t) / 3600e3);
-      derniere = { ll, t: p.timestamp };
-      const ico = L.divIcon({ className: 'ico-bateau', iconSize: [28, 28], iconAnchor: [14, 14],
-        html: `<svg viewBox="0 0 28 28" style="transform:rotate(${cog || 0}deg)"><path d="M14 2l7 22-7-5-7 5z"/></svg>` });
-      if (!bateau) bateau = L.marker(ll, { icon: ico, zIndexOffset: 1000 }).addTo(map); else { bateau.setLatLng(ll); bateau.setIcon(ico); }
-      if (premiere) { map.setView(ll, Math.max(map.getZoom(), 12)); premiere = false; }
-      res.innerHTML = `${esc(coordTxt(L.latLng(ll[0], ll[1])))}<br>Vitesse fond <b>${sog != null && isFinite(sog) ? sog.toFixed(1).replace('.', ',') : '–'} nd</b> · cap fond <b>${cog != null && !Number.isNaN(cog) ? deg3(cog) : '–'}</b> · précision ${Math.round(p.coords.accuracy)} m`;
-    }, e => { res.textContent = e.code === 1 ? 'Accès à la position refusé dans le navigateur.' : 'Position indisponible pour le moment.'; }, { enableHighAccuracy: true, maximumAge: 5000, timeout: 30000 });
+    if (GPS.pos) majBateau(GPS.pos);
+  }
+  function majBateau(p) {
+    if (!carteSuit || !map) return;
+    const { ll, cog, sog } = p;
+    const ico = L.divIcon({ className: 'ico-bateau', iconSize: [28, 28], iconAnchor: [14, 14],
+      html: `<svg viewBox="0 0 28 28" style="transform:rotate(${cog || 0}deg)"><path d="M14 2l7 22-7-5-7 5z"/></svg>` });
+    if (!bateau) bateau = L.marker(ll, { icon: ico, zIndexOffset: 1000 }).addTo(map); else { bateau.setLatLng(ll); bateau.setIcon(ico); }
+    if (premiere) { map.setView(ll, Math.max(map.getZoom(), 12)); premiere = false; }
+    $('#pos-res').innerHTML = `${esc(coordTxt(L.latLng(ll[0], ll[1])))}<br>Vitesse fond <b>${sog != null ? sog.toFixed(1).replace('.', ',') : '–'} nd</b> · cap fond <b>${cog != null ? deg3(cog) : '–'}</b> · précision ${Math.round(p.prec)} m`;
+  }
+  document.addEventListener('nav:pos', e => majBateau(e.detail));
+  document.addEventListener('nav:pos-err', e => { if (carteSuit) $('#pos-res').textContent = e.detail === 1 ? 'Accès à la position refusé dans le navigateur.' : 'Position indisponible pour le moment.'; });
+
+  /* ---------- bateaux autour : carte AIS VesselFinder ---------- */
+  function bateaux() {
+    const box = $('#ais-cadre'); if (!box) return;
+    const choix = $('#ais-centre').value, z = +$('#ais-zoom').value;
+    let c;
+    if (choix === 'gps' && GPS.pos) c = GPS.pos.ll;
+    else if (choix === 'etape' && plan[legSel]) { const p = plan[legSel].pts; c = p[p.length - 1]; }
+    else c = map ? [map.getCenter().lat, map.getCenter().lng] : [13.75, -61.1];
+    const h = Math.max(400, Math.round(box.clientWidth * 1.15));
+    const ra = encodeURIComponent(location.href.split('#')[0]);
+    box.innerHTML = `<iframe title="Carte AIS VesselFinder" loading="lazy" style="width:100%;height:${h}px;border:0" src="https://www.vesselfinder.com/aismap?zoom=${z}&lat=${c[0].toFixed(4)}&lon=${c[1].toFixed(4)}&width=100%25&height=${h}&names=true&track=false&fleet=false&fleet_name=false&fleet_hide_old_positions=false&clicktoact=false&store_pos=false&ra=${ra}"></iframe>`;
+    $('#ais-liens').innerHTML = `<a href="https://www.marinetraffic.com/fr/ais/home/centerx:${c[1].toFixed(3)}/centery:${c[0].toFixed(3)}/zoom:${z}" target="_blank" rel="noopener">Ouvrir MarineTraffic ici</a> · <a href="https://www.vesselfinder.com/?p=1&lat=${c[0].toFixed(4)}&lon=${c[1].toFixed(4)}&zoom=${z}" target="_blank" rel="noopener">Ouvrir VesselFinder ici</a>`;
+    if (choix === 'gps' && !GPS.pos) $('#ais-liens').insertAdjacentHTML('afterbegin', '<span class="alerte" style="display:block;margin-bottom:6px">Position GPS pas encore connue : carte centrée sur la vue actuelle.</span>');
   }
 
   function activerOnglet(n) {
     document.querySelectorAll('.ong').forEach(b => { const on = b.dataset.o === n; b.classList.toggle('on', on); b.setAttribute('aria-selected', on); });
     document.querySelectorAll('.pan').forEach(p => { p.hidden = p.dataset.o !== n; });
+    if (n === 'bateaux' && !$('#ais-cadre iframe')) bateaux();
   }
 
   /* ---------- initialisation ---------- */
@@ -516,6 +561,13 @@
       'Météo : couleurs et flèches': wx, 'Météo : vent animé': particules
     }, { collapsed: true, position: 'topright' }).addTo(map);
     L.control.scale({ metric: true, imperial: false, position: 'bottomleft' }).addTo(map);
+    const Compas = L.Control.extend({ options: { position: 'topleft' }, onAdd() {
+      const b = L.DomUtil.create('button', 'btn-compas leaflet-bar');
+      b.type = 'button'; b.title = 'Compas et instruments'; b.setAttribute('aria-label', 'Ouvrir le compas');
+      b.innerHTML = '<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="M12 4l3 8-3 8-3-8z"/></svg>';
+      L.DomEvent.disableClickPropagation(b); L.DomEvent.on(b, 'click', () => window.Instruments && window.Instruments.ouvrir());
+      return b; } });
+    new Compas().addTo(map);
 
     map.on('mousemove', e => { $('#coord').textContent = coordTxt(e.latlng); });
     map.on('move', () => { if (!matchMedia('(hover: hover)').matches) $('#coord').textContent = coordTxt(map.getCenter()); });
@@ -536,6 +588,10 @@
       if (e.target.id === 'eta-h') { const [h, mi] = e.target.value.split(':').map(Number); const l = plan[legSel]; const d = new Date(l.depart); d.setUTCHours(h + 4, mi); l.depart = d; eta(); }
     });
     $('#btn-pos').addEventListener('click', position);
+    $('#btn-compas2').addEventListener('click', () => window.Instruments && window.Instruments.ouvrir());
+    $('#ais-centre').addEventListener('change', bateaux);
+    $('#ais-zoom').addEventListener('change', bateaux);
+    $('#ais-maj').addEventListener('click', bateaux);
     $('#btn-mesure').addEventListener('click', () => {
       mesure.actif = !mesure.actif;
       $('#btn-mesure').textContent = mesure.actif ? 'Terminer la mesure' : 'Mesurer distance et cap';
@@ -559,11 +615,19 @@
     },
     plan(legs, sel, cb) { plan = legs; onLeg = cb; legSel = sel; if (map) { dessinerRoute(); } eta(); },
     etape(i) {
-      legSel = i; if (!map) { eta(); return; }
+      legSel = i;
+      document.dispatchEvent(new CustomEvent('nav:etape', { detail: i }));
+      if (!map) { eta(); return; }
       dessinerRoute(); eta();
       const l = plan[i];
       if (l && l.pts.length > 1) map.fitBounds(L.latLngBounds(l.pts), { padding: [40, 40], maxZoom: 12 });
       else if (l) map.setView(l.pts[0], 12);
     }
+  };
+  window.Nav = {
+    R, TZ, esc, heure, jourHeure, milles, cap, longueur, cardinal, deg3, coordTxt, dm, soleil, abri, interp, condAt,
+    W, G, GPS, gpsDemarrer, gpsArreter, activerOnglet,
+    get map() { return map; }, get plan() { return plan; }, get legSel() { return legSel; },
+    get mouillages() { return mouillages; }
   };
 })();

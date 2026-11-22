@@ -9,8 +9,13 @@ L'ancien Artifact claude.ai (https://claude.ai/artifact/XYuepLnqEPFhxZEDGY3e4b) 
   une constante globale `L` : elle masquerait Leaflet.
 - `docs/carte.js` : carte marine Leaflet (fonds Esri/OSM, OpenSeaMap, calques GeoJSON, météo Open-Meteo
   en direct, fiches de mouillage avec abri calculé, ETA, mesure, position, mode nuit). API `window.Carte`.
+- `docs/routage.js` : routage météo par isochrones (polaire approchée Excess 11, masque `data/masque.json`
+  avec marge ~0,5 mille, alizé climatologique au-delà de la prévision). API `window.Routage`.
+- `docs/instruments.js` : écran Compas plein écran (orientation de l'appareil, GPS partagé via `Nav.gpsDemarrer`). 
+- `docs/meteo.js` : vue « La Météo » (Open-Meteo 16 jours, 8 escales + 2 canaux, abri de nuit à 22 h).
+- carte.js expose `window.Nav` (fonctions et données partagées) et émet `nav:meteo`, `nav:pos`, `nav:etape`, `nav:plan`.
 - `docs/data/` : `mouillages.json` (fiches écrites à la main, à vérifier) et GeoJSON générés par
-  `data/fetch_osm.py` (Overpass) et `data/fetch_bathy.py` (ETOPO 2022, NOAA ERDDAP). Bruts dans `data/raw/` (ignoré).
+  `data/fetch_osm.py` (Overpass), `data/fetch_bathy.py` (ETOPO 2022, NOAA ERDDAP) et `data/build_masque.py`. Bruts dans `data/raw/` (ignoré).
 - `build.py` : template.html -> docs/index.html, copie img/ -> docs/img, robots.txt, .nojekyll.
 - Publier : `python3 build.py`, commit, `git push` (Pages se met à jour en 1-2 min).
 - Test local : `.claude/launch.json` (python http.server sur docs/, port 8791).
