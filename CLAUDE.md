@@ -16,7 +16,13 @@ L'ancien Artifact claude.ai (https://claude.ai/artifact/XYuepLnqEPFhxZEDGY3e4b) 
 - carte.js expose `window.Nav` (fonctions et données partagées) et émet `nav:meteo`, `nav:pos`, `nav:etape`, `nav:plan`.
 - `docs/data/` : `mouillages.json` (fiches écrites à la main, à vérifier) et GeoJSON générés par
   `data/fetch_osm.py` (Overpass), `data/fetch_bathy.py` (ETOPO 2022, NOAA ERDDAP) et `data/build_masque.py`. Bruts dans `data/raw/` (ignoré).
-- `build.py` : template.html -> docs/index.html, copie img/ -> docs/img, robots.txt, .nojekyll.
+- `build.py` : template.html -> docs/index.html, copie img/ -> docs/img, robots.txt, .nojekyll, et
+  `sw.js` (racine) -> `docs/sw.js` en remplaçant __VERSION__ (date du build) et __COQUILLE__ (fichiers de docs/).
+  Toujours relancer build.py après avoir ajouté un fichier dans docs/, sinon il manque au hors-ligne.
+- Web app iPhone : `docs/manifest.webmanifest`, icônes `docs/icones/` (régénérer : `python3 data/build_icones.py`),
+  service worker (fichiers du site réseau d'abord, tuiles en cache `fc-tuiles` gardé entre versions).
+- `docs/horsligne.js` : bouton « Télécharger la carte pour le hors-ligne » (onglet Outils), ~2 200 tuiles.
+- Plein écran de la carte : bouton sous le compas, tiroir en bas sur mobile (carte.js, `pleinEcran`, `tiroir`).
 - Publier : `python3 build.py`, commit, `git push` (Pages se met à jour en 1-2 min).
 - Test local : `.claude/launch.json` (python http.server sur docs/, port 8791).
 - Les cases à cocher sont en localStorage (propres à chaque appareil).

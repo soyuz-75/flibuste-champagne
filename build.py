@@ -18,4 +18,13 @@ for f in (HERE / "img").glob("*.jpg"):
     shutil.copy2(f, DOCS / "img" / f.name)
 (DOCS / "robots.txt").write_text("User-agent: *\nDisallow: /\n")
 (DOCS / ".nojekyll").write_text("")
+
+# service worker versionné : la liste des fichiers du site est mise en cache pour le hors-ligne
+import json, time
+fichiers = sorted(str(f.relative_to(DOCS)) for f in DOCS.rglob("*")
+                  if f.is_file() and f.name not in ("sw.js", "robots.txt", ".nojekyll", ".DS_Store"))
+sw = (HERE / "sw.js").read_text(encoding="utf-8")
+sw = sw.replace("__VERSION__", time.strftime("%Y%m%d-%H%M%S")).replace("__COQUILLE__", json.dumps(fichiers, ensure_ascii=False))
+(DOCS / "sw.js").write_text(sw, encoding="utf-8")
+print("docs/sw.js", len(fichiers), "fichiers en cache")
 print("docs/index.html", len(html) // 1024, "Ko")

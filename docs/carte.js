@@ -470,6 +470,7 @@
   /* ---------- bateaux autour : carte AIS VesselFinder ---------- */
   function bateaux() {
     const box = $('#ais-cadre'); if (!box) return;
+    if (!navigator.onLine) { box.innerHTML = '<p class="muted" style="padding:12px">Pas de réseau : la carte AIS a besoin d\'internet (Starlink ou 4G). <button type="button" class="lien-btn" id="ais-retry">Réessayer</button></p>'; return; }
     const choix = $('#ais-centre').value, z = +$('#ais-zoom').value;
     let c;
     if (choix === 'gps' && GPS.pos) c = GPS.pos.ll;
@@ -486,6 +487,69 @@
     document.querySelectorAll('.ong').forEach(b => { const on = b.dataset.o === n; b.classList.toggle('on', on); b.setAttribute('aria-selected', on); });
     document.querySelectorAll('.pan').forEach(p => { p.hidden = p.dataset.o !== n; });
     if (n === 'bateaux' && !$('#ais-cadre iframe')) bateaux();
+    if (map && estPlein() && mobile() && etatTiroir === 'ferme') tiroir('mi');
+  }
+
+  /* ---------- plein écran et tiroir (mobile) ---------- */
+  let pousse = false;
+  const station = () => $('.station');
+  const estPlein = () => station().classList.contains('plein');
+  const mobile = () => matchMedia('(max-width: 860px)').matches;
+  function pleinEcran(on, depuisHistorique) {
+    if (on === estPlein()) return;
+    station().classList.toggle('plein', on);
+    document.body.classList.toggle('carte-pleine', on);
+    const b = $('.btn-plein'); if (b) { b.setAttribute('aria-pressed', on); b.title = on ? 'Quitter le plein écran' : 'Carte en plein écran'; }
+    if (on) {
+      history.pushState({ plein: 1 }, '', location.href); pousse = true;
+      const standalone = matchMedia('(display-mode: standalone)').matches || navigator.standalone;
+      if (!standalone && document.documentElement.requestFullscreen) document.documentElement.requestFullscreen().catch(() => {});
+      tiroir('ferme');
+    } else {
+      if (document.fullscreenElement) document.exitFullscreen().catch(() => {});
+      if (pousse && !depuisHistorique) { pousse = false; history.back(); }
+      pousse = false;
+      const p = $('.panneau'); if (p) p.style.removeProperty('--tiroir');
+    }
+    setTimeout(() => map.invalidateSize(), 60);
+    setTimeout(() => map.invalidateSize(), 350);
+  }
+  window.addEventListener('popstate', () => { if (estPlein()) pleinEcran(false, true); });
+  document.addEventListener('fullscreenchange', () => { if (!document.fullscreenElement && estPlein() && !mobile()) pleinEcran(false); });
+  document.addEventListener('keydown', e => { if (e.key === 'Escape' && estPlein() && !document.body.classList.contains('ins-ouvert')) pleinEcran(false); });
+
+  const HAUT = { ferme: () => 62, mi: () => Math.round(innerHeight * 0.46), ouvert: () => Math.round(innerHeight * 0.86) };
+  let etatTiroir = 'ferme';
+  function tiroir(etat) {
+    etatTiroir = etat;
+    const p = $('.panneau'); if (!p) return;
+    p.dataset.tiroir = etat;
+    p.style.setProperty('--tiroir', HAUT[etat]() + 'px');
+    const h = $('.poignee'); if (h) h.setAttribute('aria-expanded', etat !== 'ferme');
+  }
+  function initTiroir() {
+    const p = $('.panneau');
+    if (!p || $('.poignee')) return;
+    const h = document.createElement('button');
+    h.type = 'button'; h.className = 'poignee'; h.setAttribute('aria-label', 'Ouvrir ou fermer le panneau'); h.setAttribute('aria-expanded', 'false');
+    h.innerHTML = '<i></i>';
+    p.prepend(h);
+    let y0 = null, h0 = 0, bouge = false;
+    h.addEventListener('pointerdown', e => { y0 = e.clientY; h0 = p.getBoundingClientRect().height; bouge = false; h.setPointerCapture(e.pointerId); p.classList.add('glisse'); });
+    h.addEventListener('pointermove', e => {
+      if (y0 == null) return;
+      const d = y0 - e.clientY; if (Math.abs(d) > 5) bouge = true;
+      p.style.setProperty('--tiroir', Math.max(HAUT.ferme(), Math.min(HAUT.ouvert(), h0 + d)) + 'px');
+    });
+    h.addEventListener('pointerup', () => {
+      if (y0 == null) return;
+      y0 = null; p.classList.remove('glisse');
+      if (!bouge) { tiroir(etatTiroir === 'ferme' ? 'mi' : etatTiroir === 'mi' ? 'ouvert' : 'ferme'); return; }
+      const cur = p.getBoundingClientRect().height;
+      const best = Object.keys(HAUT).reduce((a, k) => Math.abs(HAUT[k]() - cur) < Math.abs(HAUT[a]() - cur) ? k : a, 'ferme');
+      tiroir(best);
+    });
+    window.addEventListener('resize', () => { if (estPlein()) tiroir(etatTiroir); });
   }
 
   /* ---------- initialisation ---------- */
@@ -497,14 +561,14 @@
     const ATT_E = 'Tuiles © Esri, GEBCO, NOAA, Garmin, DeLorme';
     const bases = {
       'Relief marin, satellite de près': L.layerGroup([
-        L.tileLayer(esri('Ocean/World_Ocean_Base'), { maxNativeZoom: 10, maxZoom: 11, attribution: ATT_E }),
-        L.tileLayer(esri('Ocean/World_Ocean_Reference'), { maxNativeZoom: 10, maxZoom: 11 }),
-        L.tileLayer(esri('World_Imagery'), { minZoom: 12, maxZoom: 17, attribution: 'Imagerie © Esri, Maxar, Earthstar Geographics' })]),
-      'Satellite': L.tileLayer(esri('World_Imagery'), { maxNativeZoom: 18, maxZoom: 17, attribution: 'Imagerie © Esri, Maxar, Earthstar Geographics' }),
-      'Plan OpenStreetMap': L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 17, attribution: '© contributeurs OpenStreetMap' })
+        L.tileLayer(esri('Ocean/World_Ocean_Base'), { crossOrigin: 'anonymous', maxNativeZoom: 10, maxZoom: 11, attribution: ATT_E }),
+        L.tileLayer(esri('Ocean/World_Ocean_Reference'), { crossOrigin: 'anonymous', maxNativeZoom: 10, maxZoom: 11 }),
+        L.tileLayer(esri('World_Imagery'), { crossOrigin: 'anonymous', minZoom: 12, maxZoom: 17, attribution: 'Imagerie © Esri, Maxar, Earthstar Geographics' })]),
+      'Satellite': L.tileLayer(esri('World_Imagery'), { crossOrigin: 'anonymous', maxNativeZoom: 18, maxZoom: 17, attribution: 'Imagerie © Esri, Maxar, Earthstar Geographics' }),
+      'Plan OpenStreetMap': L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', { crossOrigin: 'anonymous', maxZoom: 17, attribution: '© contributeurs OpenStreetMap' })
     };
     bases['Relief marin, satellite de près'].addTo(map);
-    const seamarks = L.tileLayer('https://tiles.openseamap.org/seamark/{z}/{x}/{y}.png', { maxZoom: 17, minZoom: 9, attribution: 'Balisage © OpenSeaMap' });
+    const seamarks = L.tileLayer('https://tiles.openseamap.org/seamark/{z}/{x}/{y}.png', { crossOrigin: 'anonymous', maxZoom: 17, minZoom: 9, attribution: 'Balisage © OpenSeaMap' });
 
     const iso = L.layerGroup(), dangers = L.layerGroup(), balisage = L.layerGroup(), zones = L.layerGroup(), osmM = L.layerGroup(), mouil = L.layerGroup();
     routeLayer = L.layerGroup().addTo(map); mesureLayer = L.layerGroup().addTo(map);
@@ -568,6 +632,14 @@
       L.DomEvent.disableClickPropagation(b); L.DomEvent.on(b, 'click', () => window.Instruments && window.Instruments.ouvrir());
       return b; } });
     new Compas().addTo(map);
+    const Plein = L.Control.extend({ options: { position: 'topleft' }, onAdd() {
+      const b = L.DomUtil.create('button', 'btn-compas btn-plein leaflet-bar');
+      b.type = 'button'; b.title = 'Carte en plein écran'; b.setAttribute('aria-label', 'Carte en plein écran'); b.setAttribute('aria-pressed', 'false');
+      b.innerHTML = '<svg viewBox="0 0 24 24" aria-hidden="true"><path class="ouvrir" d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5"/><path class="fermer" d="M9 4v5H4M15 4v5h5M9 20v-5H4M15 20v-5h5"/></svg>';
+      L.DomEvent.disableClickPropagation(b); L.DomEvent.on(b, 'click', () => pleinEcran(!estPlein()));
+      return b; } });
+    new Plein().addTo(map);
+    initTiroir();
 
     map.on('mousemove', e => { $('#coord').textContent = coordTxt(e.latlng); });
     map.on('move', () => { if (!matchMedia('(hover: hover)').matches) $('#coord').textContent = coordTxt(map.getCenter()); });
@@ -592,6 +664,7 @@
     $('#ais-centre').addEventListener('change', bateaux);
     $('#ais-zoom').addEventListener('change', bateaux);
     $('#ais-maj').addEventListener('click', bateaux);
+    $('#ais-cadre').addEventListener('click', e => { if (e.target.id === 'ais-retry') bateaux(); });
     $('#btn-mesure').addEventListener('click', () => {
       mesure.actif = !mesure.actif;
       $('#btn-mesure').textContent = mesure.actif ? 'Terminer la mesure' : 'Mesurer distance et cap';
