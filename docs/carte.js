@@ -442,29 +442,118 @@
     if (GPS.demandeurs.size || GPS.suivi == null) return;
     navigator.geolocation.clearWatch(GPS.suivi); GPS.suivi = null; GPS.pos = null; GPS.derniere = null;
   }
-  let carteSuit = false, premiere = true;
+  /* ---------- ma position sur la carte : bateau, cap, route fond, cible, mini-compas ---------- */
+  let carteSuit = false, premiere = true, suivre = true, navLayer = null, widget = null;
+  const dest = (ll, brg, nm) => [ll[0] + nm / 60 * Math.cos(brg * R), ll[1] + nm / 60 * Math.sin(brg * R) / Math.cos(ll[0] * R)];
+  function majBoutonsPos() {
+    const t = carteSuit ? 'Arrêter le suivi' : 'Afficher ma position';
+    if ($('#btn-pos')) $('#btn-pos').textContent = t;
+    const b = $('.btn-pos'); if (b) { b.setAttribute('aria-pressed', carteSuit); b.title = carteSuit ? 'Arrêter le suivi de position' : 'Ma position, mon cap'; }
+  }
   function position() {
     const res = $('#pos-res');
+    if (window.Instruments) window.Instruments.activerCompas(); // pendant le clic : iOS demande l'accès au compas
     if (carteSuit) {
-      carteSuit = false; gpsArreter('carte'); $('#btn-pos').textContent = 'Afficher ma position'; res.textContent = '';
-      if (bateau) { bateau.remove(); bateau = null; } return;
+      carteSuit = false; gpsArreter('carte'); res.textContent = ''; majBoutonsPos();
+      if (bateau) { bateau.remove(); bateau = null; }
+      if (navLayer) navLayer.clearLayers();
+      if (widget) widget.hidden = true;
+      return;
     }
     if (!gpsDemarrer('carte')) { res.textContent = 'La géolocalisation n\'est pas disponible sur cet appareil.'; return; }
-    carteSuit = true; premiere = true;
-    res.textContent = 'Recherche du GPS…';
-    $('#btn-pos').textContent = 'Arrêter le suivi';
+    carteSuit = true; premiere = true; suivre = true;
+    res.textContent = 'Recherche du GPS…'; majBoutonsPos();
+    if (widget) { widget.hidden = false; widget.querySelector('.mc-recentrer').hidden = true; widget.querySelector('.mc-cap').textContent = '---°'; widget.querySelector('.mc-l').textContent = 'GPS en attente…'; }
     if (GPS.pos) majBateau(GPS.pos);
   }
-  function majBateau(p) {
-    if (!carteSuit || !map) return;
-    const { ll, cog, sog } = p;
-    const ico = L.divIcon({ className: 'ico-bateau', iconSize: [28, 28], iconAnchor: [14, 14],
-      html: `<svg viewBox="0 0 28 28" style="transform:rotate(${cog || 0}deg)"><path d="M14 2l7 22-7-5-7 5z"/></svg>` });
-    if (!bateau) bateau = L.marker(ll, { icon: ico, zIndexOffset: 1000 }).addTo(map); else { bateau.setLatLng(ll); bateau.setIcon(ico); }
-    if (premiere) { map.setView(ll, Math.max(map.getZoom(), 12)); premiere = false; }
-    $('#pos-res').innerHTML = `${esc(coordTxt(L.latLng(ll[0], ll[1])))}<br>Vitesse fond <b>${sog != null ? sog.toFixed(1).replace('.', ',') : '–'} nd</b> · cap fond <b>${cog != null ? deg3(cog) : '–'}</b> · précision ${Math.round(p.prec)} m`;
+  function recentrer() {
+    suivre = true; if (widget) widget.querySelector('.mc-recentrer').hidden = true;
+    if (GPS.pos && map) map.panTo(GPS.pos.ll);
   }
-  document.addEventListener('nav:pos', e => majBateau(e.detail));
+  // longueur en milles de 'px' pixels à l'écran, au point ll
+  function pxMilles(ll, px) {
+    const p = map.latLngToContainerPoint(ll), q = map.containerPointToLatLng([p.x, p.y - px]);
+    return milles(ll, [q.lat, q.lng]);
+  }
+  function majBateau() {
+    if (!carteSuit || !map) return;
+    const p = GPS.pos;
+    if (!p) return;
+    const { ll, cog, sog } = p;
+    const capC = window.Instruments ? window.Instruments.cap : null;
+    const cap0 = capC != null ? capC : cog;
+    const ico = L.divIcon({ className: 'ico-bateau', iconSize: [28, 28], iconAnchor: [14, 14],
+      html: `<svg viewBox="0 0 28 28" style="transform:rotate(${cap0 || 0}deg)"><path d="M14 2l7 22-7-5-7 5z"/></svg>` });
+    if (!bateau) bateau = L.marker(ll, { icon: ico, zIndexOffset: 1000, interactive: false }).addTo(map); else { bateau.setLatLng(ll); bateau.setIcon(ico); }
+    // vecteurs : cap (laiton) et route fond (corail), longueur = 30 min de route, au moins 110 px
+    navLayer.clearLayers();
+    const mini = pxMilles(ll, 110), lg = Math.max(mini, (sog || 0) * 0.5);
+    if (capC != null) L.polyline([ll, dest(ll, capC, lg)], { color: '#f2c94c', weight: 3, dashArray: '8 6', interactive: false }).addTo(navLayer);
+    if (cog != null && sog > 0.3) L.polyline([ll, dest(ll, cog, lg)], { color: '#ff6b5a', weight: 3, interactive: false }).addTo(navLayer);
+    const t = window.Instruments ? window.Instruments.cible(ll) : null;
+    let brg = null, d = null;
+    if (t) {
+      brg = cap(ll, t.pt); d = milles(ll, t.pt);
+      L.polyline([ll, t.pt], { color: '#7fd3ff', weight: 2, dashArray: '2 6', interactive: false }).addTo(navLayer);
+      L.circleMarker(t.pt, { radius: 6, color: '#7fd3ff', weight: 2, fillOpacity: 0.2, interactive: false }).addTo(navLayer);
+    }
+    if (premiere) { map.setView(ll, Math.max(map.getZoom(), 12)); premiere = false; }
+    else if (suivre && !map.getBounds().pad(-0.25).contains(ll)) map.panTo(ll, { animate: true });
+    // mini-compas
+    if (widget) {
+      widget.hidden = false;
+      const q = s => widget.querySelector(s);
+      q('.mc-aig').setAttribute('transform', `rotate(${cap0 || 0})`);
+      q('.mc-aig').style.display = cap0 != null ? '' : 'none';
+      q('.mc-cog').style.display = cog != null && sog > 0.3 ? '' : 'none';
+      if (cog != null) q('.mc-cog').setAttribute('transform', `rotate(${cog})`);
+      q('.mc-cib').style.display = brg != null ? '' : 'none';
+      if (brg != null) q('.mc-cib').setAttribute('transform', `rotate(${brg})`);
+      q('.mc-cap').textContent = cap0 != null ? deg3(cap0) : '---°';
+      q('.mc-src').textContent = capC != null ? 'compas' : cog != null ? 'cap fond' : '';
+      const v = x => x.toFixed(1).replace('.', ',');
+      q('.mc-l').innerHTML = `${sog != null ? `<b>${v(sog)}</b> nd` : '– nd'} · fond ${cog != null ? deg3(cog) : '–'}` +
+        (brg != null ? `<br><span class="mc-vers">→ ${deg3(brg)} · ${v(d)} M</span>` : '');
+    }
+    $('#pos-res').innerHTML = `${esc(coordTxt(L.latLng(ll[0], ll[1])))}<br>Vitesse fond <b>${sog != null ? sog.toFixed(1).replace('.', ',') : '–'} nd</b> · cap fond <b>${cog != null ? deg3(cog) : '–'}</b>${capC != null ? ` · cap compas <b>${deg3(capC)}</b>` : ''} · précision ${Math.round(p.prec)} m`;
+  }
+  function initNavCarte() {
+    navLayer = L.layerGroup().addTo(map);
+    const Pos = L.Control.extend({ options: { position: 'topleft' }, onAdd() {
+      const b = L.DomUtil.create('button', 'btn-compas btn-pos leaflet-bar');
+      b.type = 'button'; b.title = 'Ma position, mon cap'; b.setAttribute('aria-label', 'Afficher ma position et mon cap'); b.setAttribute('aria-pressed', 'false');
+      b.innerHTML = '<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="7"/><path d="M12 1v5M12 18v5M1 12h5M18 12h5" style="stroke:var(--laiton);fill:none"/><circle cx="12" cy="12" r="2.5" class="pt"/></svg>';
+      L.DomEvent.disableClickPropagation(b); L.DomEvent.on(b, 'click', position);
+      return b; } });
+    new Pos().addTo(map);
+    const Mini = L.Control.extend({ options: { position: 'bottomright' }, onAdd() {
+      const w = L.DomUtil.create('div', 'mini-compas');
+      w.hidden = true;
+      let g = '';
+      for (let a = 0; a < 360; a += 30) g += `<line x1="0" y1="-46" x2="0" y2="${a % 90 ? -41 : -38}" transform="rotate(${a})"/>`;
+      w.innerHTML = `<button type="button" class="mc-ouvrir" aria-label="Ouvrir le compas plein écran">
+        <svg viewBox="-56 -56 112 112" aria-hidden="true"><circle r="48" class="mc-fond"/>${g}
+          <text y="-26" class="mc-n">N</text><text x="30" y="4" class="mc-p">E</text><text y="34" class="mc-p">S</text><text x="-30" y="4" class="mc-p">O</text>
+          <g class="mc-cib"><circle cy="-47" r="5"/></g>
+          <g class="mc-cog"><path d="M0 -47 L-5 -36 L5 -36 Z"/></g>
+          <g class="mc-aig"><path d="M0 -40 L9 18 L0 10 L-9 18 Z"/></g>
+        </svg>
+        <span class="mc-t"><b class="mc-cap">---°</b><small class="mc-src"></small></span>
+        <span class="mc-l"></span></button>
+        <button type="button" class="mc-recentrer" hidden>Recentrer</button>`;
+      L.DomEvent.disableClickPropagation(w); L.DomEvent.disableScrollPropagation(w);
+      w.querySelector('.mc-ouvrir').addEventListener('click', () => window.Instruments && window.Instruments.ouvrir());
+      w.querySelector('.mc-recentrer').addEventListener('click', recentrer);
+      widget = w; return w; } });
+    new Mini().addTo(map);
+    map.on('dragstart', () => { if (carteSuit && suivre) { suivre = false; widget.querySelector('.mc-recentrer').hidden = false; } });
+    map.on('zoomend', majBateau);
+  }
+  document.addEventListener('nav:pos', () => majBateau());
+  let capT = 0; // le compas émet à chaque image : on redessine 6 fois par seconde au plus
+  document.addEventListener('nav:cap', () => { const t = performance.now(); if (t - capT > 160) { capT = t; majBateau(); } });
+  document.addEventListener('nav:etape', () => majBateau());
+  document.addEventListener('nav:plan', () => majBateau());
   document.addEventListener('nav:pos-err', e => { if (carteSuit) $('#pos-res').textContent = e.detail === 1 ? 'Accès à la position refusé dans le navigateur.' : 'Position indisponible pour le moment.'; });
 
   /* ---------- bateaux autour : carte AIS VesselFinder ---------- */
@@ -639,6 +728,7 @@
       L.DomEvent.disableClickPropagation(b); L.DomEvent.on(b, 'click', () => pleinEcran(!estPlein()));
       return b; } });
     new Plein().addTo(map);
+    initNavCarte();
     initTiroir();
 
     map.on('mousemove', e => { $('#coord').textContent = coordTxt(e.latlng); });

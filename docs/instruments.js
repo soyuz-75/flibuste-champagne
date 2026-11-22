@@ -75,6 +75,17 @@
     source = 'compas';
     if (el && !el.querySelector('#ins-activer').hidden) el.querySelector('#ins-activer').hidden = true;
     if (ouvert) dessiner();
+    if (!emis) { emis = true; requestAnimationFrame(() => { emis = false; document.dispatchEvent(new CustomEvent('nav:cap', { detail: cap })); }); }
+  }
+  let emis = false;
+  // à appeler pendant un geste (clic) : iOS exige la permission à ce moment-là
+  async function activerCompas() {
+    if (ecoute) return true;
+    if (typeof DeviceOrientationEvent !== 'undefined' && typeof DeviceOrientationEvent.requestPermission === 'function') {
+      try { if (await DeviceOrientationEvent.requestPermission() !== 'granted') return false; } catch (e) { return false; }
+    }
+    if (typeof DeviceOrientationEvent === 'undefined') return false;
+    ecouter(); return true;
   }
   function ecouter() {
     if (ecoute) return;
@@ -184,5 +195,7 @@
   // rafraîchit le guidage même sans nouveau point GPS (compas lissé)
   setInterval(() => { if (ouvert && source !== 'compas') dessiner(); }, 2000);
 
-  window.Instruments = { ouvrir, fermer, _test: { surOrientation } };
+  window.Instruments = { ouvrir, fermer, activerCompas, cible,
+    get cap() { return source === 'compas' ? cap : null; }, get ecoute() { return ecoute; },
+    _test: { surOrientation } };
 })();
