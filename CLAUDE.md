@@ -28,4 +28,6 @@ L'ancien Artifact claude.ai (https://claude.ai/artifact/XYuepLnqEPFhxZEDGY3e4b) 
 - Plein écran de la carte : bouton sous le compas, tiroir en bas sur mobile (carte.js, `pleinEcran`, `tiroir`).
 - Publier : `python3 build.py`, commit, `git push` (Pages se met à jour en 1-2 min).
 - Test local : `.claude/launch.json` (python http.server sur docs/, port 8791).
+- Style : bloc CSS « Rafraîchissement 2026 » en fin de <style> (verre dépoli via --verre/--flou, typo système --ui,
+  Bodoni gardé pour les titres). Sur mobile (<620 px) le menu devient une barre d'onglets en bas avec icônes.
 - Les cases à cocher sont en localStorage (propres à chaque appareil).

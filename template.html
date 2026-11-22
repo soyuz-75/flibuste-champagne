@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="robots" content="noindex, nofollow">
-<meta name="theme-color" content="#07141c">
+<meta name="theme-color" content="#06111a">
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="icon" href="icones/icone.svg" type="image/svg+xml">
 <link rel="apple-touch-icon" href="icones/icone-180.png">
@@ -426,6 +426,155 @@ footer{border-top:1px solid var(--laiton2);padding-block:22px;text-align:center;
   .coord{bottom:44px}
 }
 @media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}}
+
+/* ============ Rafraîchissement 2026 : verre dépoli, coins arrondis, typo système (esprit Apple) ============ */
+:root{
+  --ui:-apple-system,BlinkMacSystemFont,"SF Pro Text","SF Pro Display","Jost","Helvetica Neue",system-ui,sans-serif;
+  --body:var(--ui);
+  --nuit:#06111a; --laque:#0e2230; --laque2:#1a3444;
+  --verre:rgba(18,34,46,.55); --verre-fort:rgba(14,28,40,.78); --verre-clair:rgba(255,255,255,.08);
+  --filet:rgba(255,255,255,.12); --filet2:rgba(255,255,255,.07);
+  --flou:saturate(180%) blur(22px);
+  --r:18px; --r-s:12px;
+  --ombre:0 10px 30px rgba(0,0,0,.35),0 1px 0 rgba(255,255,255,.06) inset;
+  --laiton:#e2bc6a; --lagon:#5ad6cf; --brume:#9fb3bb;
+}
+html{background:var(--nuit)}
+body{background:transparent;letter-spacing:-.005em}
+body::after{content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;
+  background:radial-gradient(70% 50% at 85% -5%,rgba(57,198,192,.20),transparent 70%),
+             radial-gradient(60% 45% at -5% 35%,rgba(226,188,106,.10),transparent 70%),
+             radial-gradient(80% 60% at 60% 110%,rgba(239,106,76,.12),transparent 70%),
+             linear-gradient(180deg,#071521 0%,#06111a 60%,#050d14 100%)}
+body::before{background:var(--verre-fort);-webkit-backdrop-filter:var(--flou);backdrop-filter:var(--flou)}
+.verre,nav.top,.install,.ticket,.vue,.fiche,.station,.panneau,.ins-v,.jr,.leg-b.on,.mt-carte,.avert,.coord{-webkit-backdrop-filter:var(--flou);backdrop-filter:var(--flou)}
+
+/* barre de navigation flottante en pilule */
+nav.top{top:calc(env(safe-area-inset-top,0px) + 10px);margin:10px auto 0;width:max-content;max-width:calc(100% - 24px);
+  background:var(--verre-fort);border:1px solid var(--filet);border-radius:999px;box-shadow:var(--ombre)}
+nav.top .wrap{gap:2px;padding:5px!important;max-width:none}
+nav.top a{padding:9px 15px;border-radius:999px;border:0;font:600 13px/1 var(--ui);letter-spacing:0;text-transform:none;color:rgba(255,255,255,.72);transition:background .2s,color .2s}
+nav.top a.on{background:rgba(255,255,255,.16);color:#fff;box-shadow:0 1px 0 rgba(255,255,255,.12) inset}
+nav.top a:hover{color:#fff}
+.install{margin:calc(env(safe-area-inset-top,0px) + 8px) 12px 0;border:1px solid var(--filet);border-radius:var(--r);background:var(--verre-fort);padding:10px 12px;box-shadow:var(--ombre)}
+.install{padding-top:10px}
+
+/* titres : Bodoni gardé pour le caractère, texte en typo système */
+.eyebrow{font:600 12px/1 var(--ui);letter-spacing:.14em;color:var(--laiton)}
+.vh h1{letter-spacing:-.015em}
+.vh p{font-size:17px;line-height:1.5}
+.hero{background:radial-gradient(120% 90% at 78% 0%,rgba(29,83,97,.75) 0%,transparent 60%),radial-gradient(90% 70% at 10% 100%,rgba(59,29,26,.6) 0%,transparent 65%);border-bottom:0}
+.hero .lead{font:400 21px/1.4 var(--ui);color:rgba(255,255,255,.86)}
+.port img{border:2px solid rgba(255,255,255,.85);box-shadow:0 8px 20px rgba(0,0,0,.45)}
+
+/* cartes en verre */
+.ticket{border-radius:var(--r);background:rgba(243,238,226,.94);box-shadow:var(--ombre)}
+.ticket .stub{background:linear-gradient(160deg,#f0cd7e,#d7a948)}
+.todo{border:1px solid var(--filet);border-left:1px solid var(--filet);border-radius:var(--r);padding:16px 18px;background:var(--verre)}
+.todo h3{letter-spacing:.1em}
+.vue{border:1px solid var(--filet);border-radius:var(--r);background:var(--verre)}
+.frise{gap:6px}
+.jour{border:1px solid var(--filet2);border-radius:var(--r-s);background:var(--verre-clair);padding:10px}
+.specs div{border-bottom-color:var(--filet2)}
+.avis{border-radius:6px}
+.tag{border-radius:999px;border-color:var(--filet);background:var(--verre-clair)}
+td{border-bottom-color:var(--filet2)} th{border-bottom-color:var(--filet)}
+.terr,.mt-carte,footer,.total{border-top-color:var(--filet)}
+.ck{border-bottom-color:var(--filet2)}.heures li{border-bottom-color:var(--filet2)}
+.ck input{border-radius:6px;width:20px;height:20px;margin-top:2px}
+.ck input:checked{background:var(--lagon);border-color:var(--lagon)}
+
+/* boutons : pilules et contrôles segmentés */
+.btn,.m-btn,.filtre button,.plans button,.ins-b{border-radius:var(--r-s);border:1px solid var(--filet);background:var(--verre-clair);transition:background .2s,transform .1s}
+.btn:hover,.m-btn:hover,.filtre button:hover,.plans button:hover{background:rgba(255,255,255,.14)}
+.btn:active,.m-btn:active,.plans button:active,.ins-b:active{transform:scale(.98)}
+.btn{padding:11px 14px;font-weight:500}
+.btn[aria-pressed="true"],.ins-b[aria-pressed="true"]{background:var(--laiton);border-color:transparent;color:#14222a}
+.m-btn{border-radius:999px;padding:7px 12px}
+.filtre button{border-radius:999px;color:rgba(255,255,255,.8)}
+.filtre button.on{background:#fff;color:#0a1a24;border-color:transparent}
+.plans{gap:6px;padding:4px;background:var(--verre-clair);border:1px solid var(--filet2);border-radius:calc(var(--r-s) + 4px);width:max-content;max-width:100%}
+.pan .plans{width:auto;display:grid;grid-template-columns:repeat(3,minmax(0,1fr))}
+.plans button{border-color:transparent;background:none}
+.plans button.on{background:rgba(255,255,255,.92);color:#0a1a24;box-shadow:0 2px 8px rgba(0,0,0,.25)}
+.plans button.on small{color:#4b5a62}
+.pan select,.pan input[type=time]{border-radius:10px;border-color:var(--filet);background:rgba(0,0,0,.25)}
+.chip{border-radius:999px}
+
+/* station de navigation */
+.station{border:1px solid var(--filet);border-radius:22px;overflow:hidden;background:var(--verre);box-shadow:0 20px 50px rgba(0,0,0,.4)}
+.panneau{border-left:1px solid var(--filet);background:rgba(10,22,32,.35)}
+.ongs{border-bottom:0;margin:10px 10px 0;padding:3px;gap:2px;background:rgba(255,255,255,.07);border-radius:12px}
+.ong{border:0;border-radius:9px;padding:9px 2px;font:600 11.5px/1 var(--ui);letter-spacing:0;text-transform:none;color:rgba(255,255,255,.7)}
+.ong.on{background:rgba(255,255,255,.16);color:#fff;box-shadow:0 1px 4px rgba(0,0,0,.25)}
+.pan h4{font:600 12px/1.2 var(--ui);letter-spacing:.06em;color:rgba(255,255,255,.55)}
+.leg-b{border-top:0;border-radius:14px;margin-bottom:2px}
+.leg-b:hover{background:rgba(255,255,255,.06)}
+.leg-b.on{background:rgba(255,255,255,.10);box-shadow:inset 0 0 0 1px var(--filet)}
+.fiche{border:1px solid var(--filet);border-radius:var(--r);background:var(--verre)}
+.jr{border-radius:12px;border:1px solid var(--filet2);border-top:3px solid transparent;background:var(--verre-clair)}
+.jr.sejour{border-top-color:var(--laiton);background:rgba(255,255,255,.12)}
+.ais-cadre{border-radius:var(--r-s);overflow:hidden;border-color:var(--filet)}
+.barre{background:rgba(255,255,255,.1)}
+
+/* carte : contrôles et bulles en verre */
+.coord,.avert{background:var(--verre-fort);border:1px solid var(--filet);border-radius:999px;padding:6px 11px}
+.leaflet-bar{border:0!important;border-radius:14px!important;overflow:hidden;box-shadow:var(--ombre)!important}
+.leaflet-bar a{background:var(--verre-fort)!important;-webkit-backdrop-filter:var(--flou);backdrop-filter:var(--flou);border-color:var(--filet2)!important;color:#fff!important;width:38px!important;height:38px!important;line-height:38px!important}
+.leaflet-control-layers{background:var(--verre-fort)!important;-webkit-backdrop-filter:var(--flou);backdrop-filter:var(--flou);border:1px solid var(--filet)!important;border-radius:14px!important;box-shadow:var(--ombre)!important}
+.btn-compas{width:38px;height:38px;padding:7px;border-radius:14px!important;background:var(--verre-fort);-webkit-backdrop-filter:var(--flou);backdrop-filter:var(--flou);border:1px solid var(--filet)!important;box-shadow:var(--ombre)}
+.btn-compas svg{stroke:#fff}
+.btn-plein svg path{stroke:#fff}
+.btn-pos svg path{stroke:#fff!important}
+.btn-pos[aria-pressed=true]{background:#0a84ff}.btn-pos[aria-pressed=true] svg circle{stroke:#fff}.btn-pos[aria-pressed=true] svg .pt{fill:#fff}
+.leaflet-popup-content-wrapper{background:var(--verre-fort);-webkit-backdrop-filter:var(--flou);backdrop-filter:var(--flou);border:1px solid var(--filet);border-radius:16px;box-shadow:0 14px 40px rgba(0,0,0,.45)}
+.leaflet-popup-tip{background:var(--verre-fort)}
+.leaflet-container a.leaflet-popup-close-button{color:rgba(255,255,255,.7);top:6px;right:6px}
+.leaflet-tooltip{background:var(--verre-fort);border:1px solid var(--filet);border-radius:10px;box-shadow:0 4px 14px rgba(0,0,0,.35)}
+.leaflet-tooltip-top:before{border-top-color:var(--verre-fort)}
+.leaflet-control-attribution{background:rgba(6,17,26,.55)!important;border-radius:8px 0 0 0}
+.leaflet-control-scale-line{background:rgba(6,17,26,.55);border-radius:0 0 4px 4px}
+.mes-lab{border-radius:8px}
+.mc-ouvrir{background:var(--verre-fort);-webkit-backdrop-filter:var(--flou);backdrop-filter:var(--flou);border:1px solid var(--filet);border-radius:20px;box-shadow:0 12px 30px rgba(0,0,0,.45);font-family:var(--ui)}
+.mc-fond{fill:rgba(255,255,255,.06);stroke:rgba(255,255,255,.25)}
+.mini-compas line{stroke:rgba(255,255,255,.55)}
+.mc-cap{font-family:var(--ui);font-weight:600;letter-spacing:-.02em}
+.mc-recentrer{background:#0a84ff;color:#fff;border-radius:999px;padding:8px 16px;font-family:var(--ui)}
+
+/* compas plein écran */
+#instruments{background:radial-gradient(80% 60% at 50% 0%,rgba(57,198,192,.16),transparent 70%),linear-gradient(180deg,#081824,#050d14)}
+.ins-v{border:1px solid var(--filet);border-radius:var(--r);background:var(--verre)}
+.ins-v span{font:600 11px/1 var(--ui);letter-spacing:.06em;color:rgba(255,255,255,.55)}
+.ins-v b{font-family:var(--ui);font-weight:600;letter-spacing:-.02em}
+.rose .fond{fill:rgba(255,255,255,.05);stroke:rgba(255,255,255,.2)}
+.rose .cap-txt{font-family:var(--ui);font-weight:600}
+.ins-b{border-radius:999px;padding:9px 14px}
+
+@media (max-width:860px){
+  .station{border-radius:18px}
+  .station.plein{border-radius:0;border:0;background:#06111a}
+  .panneau{border-top:1px solid var(--filet)}
+  .station.plein .panneau{background:var(--verre-fort);-webkit-backdrop-filter:var(--flou);backdrop-filter:var(--flou);border-top:1px solid var(--filet);border-radius:22px 22px 0 0;box-shadow:0 -10px 30px rgba(0,0,0,.4)}
+  .station.plein .ongs{margin:0 10px}
+  .station.plein .carte-w{bottom:40px}
+}
+@media (max-width:620px){.install{margin-inline:8px}}
+nav.top svg{display:none}
+@media (max-width:620px){
+  body{padding-bottom:calc(66px + env(safe-area-inset-bottom,0px))}
+  nav.top{position:fixed;top:auto;bottom:0;left:0;right:0;width:auto;max-width:none;margin:0;border-radius:0;border:0;border-top:1px solid var(--filet);box-shadow:0 -6px 24px rgba(0,0,0,.3);padding-bottom:env(safe-area-inset-bottom,0px);z-index:1200}
+  nav.top .wrap{display:grid;grid-template-columns:repeat(6,1fr);gap:0;padding:6px 2px 4px!important;overflow:visible}
+  nav.top a{display:grid;justify-items:center;gap:3px;padding:2px 0;border-radius:0;background:none!important;box-shadow:none!important;font:500 10px/1.1 var(--ui);color:rgba(255,255,255,.55);min-width:0}
+  nav.top a span{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%}
+  nav.top .art{display:none}
+  nav.top svg{display:block;width:25px;height:25px;fill:none;stroke:currentColor;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round}
+  nav.top a.on{color:var(--laiton)}
+  nav.top a.on svg{stroke-width:2.1}
+  .view{padding-top:6px}
+}
+@supports not ((backdrop-filter:blur(1px)) or (-webkit-backdrop-filter:blur(1px))){
+  :root{--verre:rgba(18,34,46,.92);--verre-fort:rgba(14,28,40,.96)}
+}
 </style>
 </head>
 <body>
@@ -436,12 +585,12 @@ footer{border-top:1px solid var(--laiton2);padding-block:22px;text-align:center;
   <button type="button" id="install-x" aria-label="Fermer">✕</button>
 </div>
 <nav class="top" aria-label="Pages du site"><div class="wrap">
-  <a href="#pont" data-v="pont">Le Pont</a>
-  <a href="#equipage" data-v="equipage">L'Équipage</a>
-  <a href="#route" data-v="route">La Route</a>
-  <a href="#escales" data-v="escales">Les Escales</a>
-  <a href="#meteo" data-v="meteo">La Météo</a>
-  <a href="#preparatifs" data-v="preparatifs">Les Préparatifs</a>
+  <a href="#pont" data-v="pont"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 21V4h11l-2 4 2 4H5"/></svg><span><span class="art">Le </span>Pont</span></a>
+  <a href="#equipage" data-v="equipage"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="9" cy="8" r="3"/><path d="M3 20c0-3.3 2.7-6 6-6s6 2.7 6 6"/><circle cx="17" cy="9" r="2.4"/><path d="M16 14.2c2.9.4 5 2.7 5 5.8"/></svg><span><span class="art">L'</span>Équipage</span></a>
+  <a href="#route" data-v="route"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 4 3 6v14l6-2 6 2 6-2V4l-6 2-6-2zM9 4v14M15 6v14"/></svg><span><span class="art">La </span>Route</span></a>
+  <a href="#escales" data-v="escales"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 21s-7-6.2-7-11a7 7 0 0 1 14 0c0 4.8-7 11-7 11z"/><circle cx="12" cy="10" r="2.5"/></svg><span><span class="art">Les </span>Escales</span></a>
+  <a href="#meteo" data-v="meteo"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="8" cy="8" r="3"/><path d="M8 2v1M2 8h1M3.8 3.8l.7.7M12.2 3.8l-.7.7M7 20h10a4 4 0 0 0 0-8 5 5 0 0 0-9.6 1.5A3.3 3.3 0 0 0 7 20z"/></svg><span><span class="art">La </span>Météo</span></a>
+  <a href="#preparatifs" data-v="preparatifs"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M10 6h10M10 12h10M10 18h10M4 6l1.2 1.2L7.5 5M4 12l1.2 1.2L7.5 11M4 18l1.2 1.2L7.5 17"/></svg><span><span class="art">Les </span>Prépa<span class="art">ratifs</span></span></a>
 </div></nav>
 
 <main>
