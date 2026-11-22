@@ -23,7 +23,7 @@ L'ancien Artifact claude.ai (https://claude.ai/artifact/XYuepLnqEPFhxZEDGY3e4b) 
   service worker (fichiers du site réseau d'abord, tuiles en cache `fc-tuiles` gardé entre versions).
 - `docs/horsligne.js` : bouton « Télécharger la carte pour le hors-ligne » (onglet Outils), ~2 200 tuiles.
 - Position sur la carte : bouton cible (carte.js `position`, `majBateau`) = bateau orienté au compas, trait laiton (cap),
-  trait corail (route fond), pointillé bleu vers la cible (`Instruments.cible`), mini-compas en bas à droite, suivi + « Recentrer ».
+  trait corail (route fond), pointillé bleu vers la cible (`Instruments.cible`), mini-compas en bas à droite toujours visible (touche = démarre le suivi), suivi mémorisé (localStorage fc-suivi) + « Recentrer ».
   instruments.js émet `nav:cap` et expose `Instruments.cap` / `activerCompas()` (permission iOS pendant le clic).
 - Plein écran de la carte : bouton sous le compas, tiroir en bas sur mobile (carte.js, `pleinEcran`, `tiroir`).
 - Publier : `python3 build.py`, commit, `git push` (Pages se met à jour en 1-2 min).

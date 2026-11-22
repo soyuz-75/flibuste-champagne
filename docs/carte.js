@@ -450,20 +450,30 @@
     if ($('#btn-pos')) $('#btn-pos').textContent = t;
     const b = $('.btn-pos'); if (b) { b.setAttribute('aria-pressed', carteSuit); b.title = carteSuit ? 'Arrêter le suivi de position' : 'Ma position, mon cap'; }
   }
-  function position() {
+  function widgetRepos() {
+    if (!widget) return;
+    const q = s => widget.querySelector(s);
+    q('.mc-recentrer').hidden = true; q('.mc-aig').style.display = 'none'; q('.mc-cog').style.display = 'none'; q('.mc-cib').style.display = 'none';
+    q('.mc-cap').textContent = '---°'; q('.mc-src').textContent = '';
+    q('.mc-l').innerHTML = 'Touche pour afficher<br>ma position et mon cap';
+    q('.mc-ouvrir').setAttribute('aria-label', 'Afficher ma position et mon cap');
+  }
+  function memo(on) { try { on ? localStorage.setItem('fc-suivi', '1') : localStorage.removeItem('fc-suivi'); } catch (e) { } }
+  function position(auto) {
     const res = $('#pos-res');
-    if (window.Instruments) window.Instruments.activerCompas(); // pendant le clic : iOS demande l'accès au compas
-    if (carteSuit) {
-      carteSuit = false; gpsArreter('carte'); res.textContent = ''; majBoutonsPos();
+    if (auto !== true && window.Instruments) window.Instruments.activerCompas(); // pendant le clic : iOS demande l'accès au compas
+    if (carteSuit && auto !== true) {
+      carteSuit = false; gpsArreter('carte'); res.textContent = ''; majBoutonsPos(); memo(false);
       if (bateau) { bateau.remove(); bateau = null; }
       if (navLayer) navLayer.clearLayers();
-      if (widget) widget.hidden = true;
+      widgetRepos();
       return;
     }
+    if (carteSuit) return;
     if (!gpsDemarrer('carte')) { res.textContent = 'La géolocalisation n\'est pas disponible sur cet appareil.'; return; }
-    carteSuit = true; premiere = true; suivre = true;
+    carteSuit = true; premiere = true; suivre = true; memo(true);
     res.textContent = 'Recherche du GPS…'; majBoutonsPos();
-    if (widget) { widget.hidden = false; widget.querySelector('.mc-recentrer').hidden = true; widget.querySelector('.mc-cap').textContent = '---°'; widget.querySelector('.mc-l').textContent = 'GPS en attente…'; }
+    if (widget) { widget.querySelector('.mc-recentrer').hidden = true; widget.querySelector('.mc-cap').textContent = '---°'; widget.querySelector('.mc-l').textContent = 'GPS en attente…'; widget.querySelector('.mc-ouvrir').setAttribute('aria-label', 'Ouvrir le compas plein écran'); }
     if (GPS.pos) majBateau(GPS.pos);
   }
   function recentrer() {
@@ -501,7 +511,6 @@
     else if (suivre && !map.getBounds().pad(-0.25).contains(ll)) map.panTo(ll, { animate: true });
     // mini-compas
     if (widget) {
-      widget.hidden = false;
       const q = s => widget.querySelector(s);
       q('.mc-aig').setAttribute('transform', `rotate(${cap0 || 0})`);
       q('.mc-aig').style.display = cap0 != null ? '' : 'none';
@@ -510,7 +519,7 @@
       q('.mc-cib').style.display = brg != null ? '' : 'none';
       if (brg != null) q('.mc-cib').setAttribute('transform', `rotate(${brg})`);
       q('.mc-cap').textContent = cap0 != null ? deg3(cap0) : '---°';
-      q('.mc-src').textContent = capC != null ? 'compas' : cog != null ? 'cap fond' : '';
+      q('.mc-src').textContent = capC != null ? 'compas' : window.Instruments && !window.Instruments.ecoute && typeof DeviceOrientationEvent !== 'undefined' && DeviceOrientationEvent.requestPermission ? 'touche : compas' : cog != null ? 'cap fond' : '';
       const v = x => x.toFixed(1).replace('.', ',');
       q('.mc-l').innerHTML = `${sog != null ? `<b>${v(sog)}</b> nd` : '– nd'} · fond ${cog != null ? deg3(cog) : '–'}` +
         (brg != null ? `<br><span class="mc-vers">→ ${deg3(brg)} · ${v(d)} M</span>` : '');
@@ -528,7 +537,6 @@
     new Pos().addTo(map);
     const Mini = L.Control.extend({ options: { position: 'bottomright' }, onAdd() {
       const w = L.DomUtil.create('div', 'mini-compas');
-      w.hidden = true;
       let g = '';
       for (let a = 0; a < 360; a += 30) g += `<line x1="0" y1="-46" x2="0" y2="${a % 90 ? -41 : -38}" transform="rotate(${a})"/>`;
       w.innerHTML = `<button type="button" class="mc-ouvrir" aria-label="Ouvrir le compas plein écran">
@@ -542,10 +550,17 @@
         <span class="mc-l"></span></button>
         <button type="button" class="mc-recentrer" hidden>Recentrer</button>`;
       L.DomEvent.disableClickPropagation(w); L.DomEvent.disableScrollPropagation(w);
-      w.querySelector('.mc-ouvrir').addEventListener('click', () => window.Instruments && window.Instruments.ouvrir());
+      // sans suivi : démarre la position (et le compas) ; avec suivi : ouvre le compas plein écran
+      w.querySelector('.mc-ouvrir').addEventListener('click', () => {
+        if (!carteSuit) position();
+        else if (window.Instruments) { if (!window.Instruments.ecoute) window.Instruments.activerCompas(); else window.Instruments.ouvrir(); }
+      });
       w.querySelector('.mc-recentrer').addEventListener('click', recentrer);
       widget = w; return w; } });
     new Mini().addTo(map);
+    widgetRepos();
+    let suivi = false; try { suivi = localStorage.getItem('fc-suivi') === '1'; } catch (e) { }
+    if (suivi) position(true); // reprend le suivi ; sur iPhone le compas attend une touche (cap fond GPS en attendant)
     map.on('dragstart', () => { if (carteSuit && suivre) { suivre = false; widget.querySelector('.mc-recentrer').hidden = false; } });
     map.on('zoomend', majBateau);
   }
