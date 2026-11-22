@@ -851,8 +851,9 @@ function show(v,scroll){
   try{localStorage.setItem('fc-vue',v)}catch(e){}
 }
 document.addEventListener('click',e=>{
-  const a=e.target.closest('a[href^="#"]');if(!a)return;
-  e.preventDefault();const v=a.getAttribute('href').slice(1);show(v,true);
+  const a=e.target.closest('a[href^="#"]');if(!a||a.closest('.leaflet-container'))return;
+  const v=a.getAttribute('href').slice(1);if(!VIEWS.includes(v))return; // ex. la croix des bulles Leaflet (#close)
+  e.preventDefault();show(v,true);
   try{history.replaceState(null,'','#'+v)}catch(e){}
 });
 
