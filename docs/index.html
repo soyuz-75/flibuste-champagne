@@ -613,6 +613,11 @@ nav.top svg{display:none}
 .pc-top{color:#8bd17c}.pc-bon{color:var(--lagon)}.pc-moyen{color:#f2c94c}.pc-eviter{color:#ff8a7a}
 .pc-grille,.pc-dangers,.pc-regles,.sc-iles{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:12px}
 .pc-carte,.pc-danger,.pc-regle,.sc-ile{border:1px solid var(--filet);border-radius:var(--r);padding:14px 16px;background:var(--verre);font-size:15px;display:grid;gap:6px;align-content:start}
+.pc-photo{margin:-14px -16px 4px;position:relative;aspect-ratio:3/2;overflow:hidden;border-radius:var(--r) var(--r) 0 0;background:rgba(127,127,127,.12)}
+.pc-photo img{width:100%;height:100%;object-fit:cover;display:block}
+.pc-photo figcaption{position:absolute;right:0;bottom:0;max-width:100%;padding:2px 7px;font:11px/1.4 var(--ui);background:rgba(0,0,0,.45);border-top-left-radius:8px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.pc-photo figcaption:empty{display:none}
+.pc-photo figcaption a{color:rgba(255,255,255,.9);text-decoration:none}
 .pc-carte header{display:flex;justify-content:space-between;gap:8px;align-items:baseline}
 .pc-carte h4,.pc-danger h4{margin:0;font:italic 500 21px/1.15 var(--disp)}
 .pc-note{color:#f2c94c;font-size:14px;white-space:nowrap;letter-spacing:1px}.pc-note .vide{color:rgba(255,255,255,.18)}

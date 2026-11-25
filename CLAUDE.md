@@ -16,6 +16,8 @@ L'ancien Artifact claude.ai (https://claude.ai/artifact/XYuepLnqEPFhxZEDGY3e4b) 
 - carte.js expose `window.Nav` (fonctions et données partagées) et émet `nav:meteo`, `nav:pos`, `nav:etape`, `nav:plan`.
 - `docs/peche.js` (page Pêche : poissons, ciguatera, règles, faune dangereuse) et `docs/securite.js` (page Sécurité :
   numéros, MAYDAY, protocoles, consignes par île). Contenu dans les JS, cadre et règles de pêche dans template.html.
+  Photos des poissons : `docs/img/poissons/<id>.jpg` + crédits `docs/data/poissons-credits.json`, via
+  `python3 data/fetch_poissons.py` (Wikimedia Commons, `FORCER` pour imposer un fichier ; l'id = champ `id` de peche.js).
 - `docs/escales3d.js` : carte 3D de la page Escales (MapLibre 4.7.1 chargé à la demande, relief AWS Terrarium via le
   protocole `relief://` qui aplatit la mer, satellite Esri). Lieux dans `docs/data/poi.json` (à la main, positions
   approximatives), sentiers `docs/data/randos.geojson` (`python3 data/fetch_randos.py`, Overpass).
