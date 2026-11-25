@@ -1,6 +1,6 @@
 /* Service worker de Flibuste & Champagne. Source : sw.js à la racine ; build.py le copie dans docs/
-   en remplaçant 20261122-170336 et ["carte.js", "data/balisage.geojson", "data/dangers.geojson", "data/isobathes.geojson", "data/masque.json", "data/mouillages.json", "data/osm_mouillages.geojson", "data/zones.geojson", "horsligne.js", "icones/icone-180.png", "icones/icone-192.png", "icones/icone-512.png", "icones/icone-maskable-512.png", "icones/icone.svg", "img/anastasia.jpg", "img/iris.jpg", "img/joseph.jpg", "img/max.jpg", "img/philippe.jpg", "index.html", "instruments.js", "manifest.webmanifest", "meteo.js", "routage.js"] (liste des fichiers du site). */
-const VERSION = '20261122-170336';
+   en remplaçant 20261125-110122 et ["carte.js", "data/balisage.geojson", "data/dangers.geojson", "data/isobathes.geojson", "data/masque.json", "data/mouillages.json", "data/osm_mouillages.geojson", "data/zones.geojson", "horsligne.js", "icones/icone-180.png", "icones/icone-192.png", "icones/icone-512.png", "icones/icone-maskable-512.png", "icones/icone.svg", "img/anastasia.jpg", "img/iris.jpg", "img/joseph.jpg", "img/max.jpg", "img/philippe.jpg", "index.html", "instruments.js", "manifest.webmanifest", "meteo.js", "routage.js"] (liste des fichiers du site). */
+const VERSION = '20261125-110122';
 const COQUILLE = 'fc-coquille-' + VERSION;
 const TUILES = 'fc-tuiles';     // gardé d'une version à l'autre (carte hors ligne)
 const POLICES = 'fc-polices';

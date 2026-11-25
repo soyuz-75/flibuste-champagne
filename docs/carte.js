@@ -289,7 +289,7 @@
     if (map.hasLayer(particules)) particules.go();
     legende();
     for (const m of mouillages) peindreMarqueur(m);
-    if (ficheId) fiche(ficheId, false);
+    if (ficheId) fiche(ficheId, false, false);
   }
   function legende() {
     const r = RAMPE[W.mode], u = { vent: 'nœuds', houle: 'm', courant: 'nœuds' }[W.mode];
@@ -340,7 +340,7 @@
     const st = m.type === 'secours' ? { cls: 'secours' } : abri(m, condAt(m.lat, m.lon));
     mk.setIcon(ancre(st.cls + (ficheId === m.id ? ' sel' : '')));
   }
-  function fiche(id, centrer = true) {
+  function fiche(id, centrer = true, montrer = true) {
     const m = mouillages.find(x => x.id === id); if (!m) return;
     const prev = ficheId; ficheId = id;
     if (prev && prev !== id) peindreMarqueur(mouillages.find(x => x.id === prev));
@@ -363,7 +363,7 @@
       </dl>
       <p class="muted">Fiche indicative : à confirmer avec le guide de croisière et la carte officielle.</p>
     </article>`;
-    activerOnglet('mouillages');
+    if (montrer) activerOnglet('mouillages'); // pas quand on rafraîchit la fiche (curseur des heures)
     if (centrer) map.setView([m.lat, m.lon], Math.max(map.getZoom(), 13));
   }
   function listeMouillages() {
@@ -653,6 +653,8 @@
       const best = Object.keys(HAUT).reduce((a, k) => Math.abs(HAUT[k]() - cur) < Math.abs(HAUT[a]() - cur) ? k : a, 'ferme');
       tiroir(best);
     });
+    // clavier (Entrée / Espace) : pas d'événements pointeur, seulement un clic avec detail 0
+    h.addEventListener('click', e => { if (e.detail === 0) tiroir(etatTiroir === 'ferme' ? 'mi' : etatTiroir === 'mi' ? 'ouvert' : 'ferme'); });
     window.addEventListener('resize', () => { if (estPlein()) tiroir(etatTiroir); });
   }
 
