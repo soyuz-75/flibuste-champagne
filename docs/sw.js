@@ -1,15 +1,17 @@
 /* Service worker de Flibuste & Champagne. Source : sw.js à la racine ; build.py le copie dans docs/
-   en remplaçant 20261125-110122 et ["carte.js", "data/balisage.geojson", "data/dangers.geojson", "data/isobathes.geojson", "data/masque.json", "data/mouillages.json", "data/osm_mouillages.geojson", "data/zones.geojson", "horsligne.js", "icones/icone-180.png", "icones/icone-192.png", "icones/icone-512.png", "icones/icone-maskable-512.png", "icones/icone.svg", "img/anastasia.jpg", "img/iris.jpg", "img/joseph.jpg", "img/max.jpg", "img/philippe.jpg", "index.html", "instruments.js", "manifest.webmanifest", "meteo.js", "routage.js"] (liste des fichiers du site). */
-const VERSION = '20261125-110122';
+   en remplaçant 20261125-114106 et ["ancre.js", "carte.js", "data/balisage.geojson", "data/dangers.geojson", "data/isobathes.geojson", "data/masque.json", "data/mouillages.json", "data/osm_mouillages.geojson", "data/poi.json", "data/randos.geojson", "data/zones.geojson", "escales3d.js", "horsligne.js", "icones/icone-180.png", "icones/icone-192.png", "icones/icone-512.png", "icones/icone-maskable-512.png", "icones/icone.svg", "img/anastasia.jpg", "img/iris.jpg", "img/joseph.jpg", "img/max.jpg", "img/philippe.jpg", "index.html", "instruments.js", "manifest.webmanifest", "meteo.js", "peche.js", "routage.js", "securite.js"] (liste des fichiers du site). */
+const VERSION = '20261125-114106';
 const COQUILLE = 'fc-coquille-' + VERSION;
 const TUILES = 'fc-tuiles';     // gardé d'une version à l'autre (carte hors ligne)
 const POLICES = 'fc-polices';
-const FICHIERS = ["carte.js", "data/balisage.geojson", "data/dangers.geojson", "data/isobathes.geojson", "data/masque.json", "data/mouillages.json", "data/osm_mouillages.geojson", "data/zones.geojson", "horsligne.js", "icones/icone-180.png", "icones/icone-192.png", "icones/icone-512.png", "icones/icone-maskable-512.png", "icones/icone.svg", "img/anastasia.jpg", "img/iris.jpg", "img/joseph.jpg", "img/max.jpg", "img/philippe.jpg", "index.html", "instruments.js", "manifest.webmanifest", "meteo.js", "routage.js"];
+const FICHIERS = ["ancre.js", "carte.js", "data/balisage.geojson", "data/dangers.geojson", "data/isobathes.geojson", "data/masque.json", "data/mouillages.json", "data/osm_mouillages.geojson", "data/poi.json", "data/randos.geojson", "data/zones.geojson", "escales3d.js", "horsligne.js", "icones/icone-180.png", "icones/icone-192.png", "icones/icone-512.png", "icones/icone-maskable-512.png", "icones/icone.svg", "img/anastasia.jpg", "img/iris.jpg", "img/joseph.jpg", "img/max.jpg", "img/philippe.jpg", "index.html", "instruments.js", "manifest.webmanifest", "meteo.js", "peche.js", "routage.js", "securite.js"];
 const EXTERNES = [
   'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js',
-  'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css'
+  'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css',
+  'https://cdnjs.cloudflare.com/ajax/libs/maplibre-gl/4.7.1/maplibre-gl.min.js',
+  'https://cdnjs.cloudflare.com/ajax/libs/maplibre-gl/4.7.1/maplibre-gl.min.css'
 ];
-const HOTES_TUILES = ['server.arcgisonline.com', 'tiles.openseamap.org', 'tile.openstreetmap.org'];
+const HOTES_TUILES = ['server.arcgisonline.com', 'tiles.openseamap.org', 'tile.openstreetmap.org', 's3.amazonaws.com'];
 
 self.addEventListener('install', e => {
   e.waitUntil((async () => {

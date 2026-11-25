@@ -14,6 +14,13 @@ L'ancien Artifact claude.ai (https://claude.ai/artifact/XYuepLnqEPFhxZEDGY3e4b) 
 - `docs/instruments.js` : écran Compas plein écran (orientation de l'appareil, GPS partagé via `Nav.gpsDemarrer`). 
 - `docs/meteo.js` : vue « La Météo » (Open-Meteo 16 jours, 8 escales + 2 canaux, abri de nuit à 22 h).
 - carte.js expose `window.Nav` (fonctions et données partagées) et émet `nav:meteo`, `nav:pos`, `nav:etape`, `nav:plan`.
+- `docs/peche.js` (page Pêche : poissons, ciguatera, règles, faune dangereuse) et `docs/securite.js` (page Sécurité :
+  numéros, MAYDAY, protocoles, consignes par île). Contenu dans les JS, cadre et règles de pêche dans template.html.
+- `docs/escales3d.js` : carte 3D de la page Escales (MapLibre 4.7.1 chargé à la demande, relief AWS Terrarium via le
+  protocole `relief://` qui aplatit la mer, satellite Esri). Lieux dans `docs/data/poi.json` (à la main, positions
+  approximatives), sentiers `docs/data/randos.geojson` (`python3 data/fetch_randos.py`, Overpass).
+- `docs/ancre.js` : alarme de mouillage (onglet Outils de la carte), état dans localStorage `fc-ancre`, API `window.Ancre`.
+- Menu mobile : 4 onglets + « Plus » (feuille avec les liens `a.sec` : Équipage, Prépa, Pêche, Sécurité).
 - `docs/data/` : `mouillages.json` (fiches écrites à la main, à vérifier) et GeoJSON générés par
   `data/fetch_osm.py` (Overpass), `data/fetch_bathy.py` (ETOPO 2022, NOAA ERDDAP) et `data/build_masque.py`. Bruts dans `data/raw/` (ignoré).
 - `build.py` : template.html -> docs/index.html, copie img/ -> docs/img, robots.txt, .nojekyll, et

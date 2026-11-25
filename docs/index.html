@@ -572,6 +572,131 @@ nav.top svg{display:none}
   nav.top a.on svg{stroke-width:2.1}
   .view{padding-top:6px}
 }
+
+/* ---------- carte 3D des escales ---------- */
+.e3d-sec{margin-bottom:34px}
+.e3d-iles{display:flex;gap:6px;overflow-x:auto;scrollbar-width:none;padding:2px 0 10px}
+.e3d-iles button{flex:none;border:1px solid var(--filet);background:var(--verre-clair);color:rgba(255,255,255,.82);font:600 13px/1 var(--ui);padding:9px 14px;border-radius:999px;cursor:pointer}
+.e3d-iles button.on{background:#fff;color:#0a1a24;border-color:transparent}
+.e3d-w{position:relative;border:1px solid var(--filet);border-radius:22px;overflow:hidden;height:min(68vh,640px);height:min(68dvh,640px);min-height:380px;box-shadow:0 20px 50px rgba(0,0,0,.4)}
+.e3d{position:absolute!important;inset:0;width:100%;height:100%;background:#0b2a3a}
+.e3d-msg{position:absolute;inset:0;display:grid;place-items:center;padding:20px;text-align:center;color:var(--brume)}
+.e3d-mode{position:absolute;left:12px;top:12px;z-index:2;background:var(--verre-fort);-webkit-backdrop-filter:var(--flou);backdrop-filter:var(--flou);border:1px solid var(--filet);color:#fff;font:600 13px/1 var(--ui);padding:9px 13px;border-radius:999px;cursor:pointer}
+.e3d-cats{display:flex;flex-wrap:wrap;gap:6px;margin-top:12px}
+.e3d-cats button{border:1px solid var(--filet);background:var(--verre-clair);color:#fff;font:500 13px/1 var(--ui);padding:8px 12px;border-radius:999px;cursor:pointer;box-shadow:inset 3px 0 0 var(--c)}
+.e3d-cats button[aria-pressed="false"]{opacity:.45;box-shadow:none;text-decoration:line-through}
+.e3d-note{margin-top:10px}
+.e3d-poi{width:34px;height:34px;border-radius:50% 50% 50% 4px;transform:rotate(-45deg);background:var(--verre-fort);-webkit-backdrop-filter:var(--flou);backdrop-filter:var(--flou);border:2px solid var(--c);display:grid;place-items:center;cursor:pointer;padding:0;box-shadow:0 4px 12px rgba(0,0,0,.5)}
+.e3d-poi span{transform:rotate(45deg);font-size:16px;line-height:1}
+.e3d-poi:hover,.e3d-poi:focus-visible{transform:rotate(-45deg) scale(1.15)}
+.e3d-ancre{font-size:15px;width:24px;height:24px;display:grid;place-items:center;border-radius:50%;background:rgba(6,17,26,.75);border:1px solid rgba(255,255,255,.4);cursor:pointer}
+.e3d-pop .maplibregl-popup-content{background:var(--verre-fort);-webkit-backdrop-filter:var(--flou);backdrop-filter:var(--flou);color:var(--ecume);border:1px solid var(--filet);border-radius:16px;padding:14px 16px;box-shadow:0 14px 40px rgba(0,0,0,.5);font:400 14px/1.45 var(--ui);max-height:min(46vh,330px);overflow:auto;overscroll-behavior:contain}
+.e3d-pop .maplibregl-popup-tip{border-top-color:rgba(14,28,40,.9)!important;border-bottom-color:rgba(14,28,40,.9)!important}
+.e3d-pop .maplibregl-popup-close-button{color:#fff;font-size:20px;right:6px;top:4px}
+.e3d-pop h3{font:italic 500 21px/1.15 var(--disp);margin:4px 0 6px}
+.e3d-pop p{margin:0 0 6px}
+.e3d-cat{font:600 11px/1.2 var(--ui);letter-spacing:.06em;text-transform:uppercase;color:var(--brume)}
+.e3d-hist{margin-top:8px;padding:10px 12px;border-radius:12px;background:rgba(226,188,106,.12);border:1px solid rgba(226,188,106,.25)}
+.e3d-hist b{font:600 11px/1 var(--ui);letter-spacing:.08em;text-transform:uppercase;color:var(--laiton)}
+.e3d-hist p{margin:6px 0 0;font-style:italic}
+.e3d-att{color:#ffb4a3;font-size:13px}
+.maplibregl-ctrl-group{background:var(--verre-fort)!important;border-radius:14px!important;border:1px solid var(--filet)}
+.maplibregl-ctrl-group button .maplibregl-ctrl-icon{filter:invert(1)}
+.maplibregl-ctrl-attrib{background:rgba(6,17,26,.55)!important;color:var(--brume)}
+.maplibregl-ctrl-attrib a{color:var(--brume)}
+
+/* ---------- pêche ---------- */
+.pc-cig-box{border:1px solid var(--filet);border-radius:var(--r);padding:18px 20px;background:var(--verre)}
+.pc-cig-box ul{margin:12px 0 0;padding-left:20px;display:grid;gap:6px}
+.pc-leg{margin:-6px 0 10px}
+.pc-g{font:600 13px/1 var(--ui);letter-spacing:.1em;text-transform:uppercase;margin:24px 0 10px}
+.pc-top{color:#8bd17c}.pc-bon{color:var(--lagon)}.pc-moyen{color:#f2c94c}.pc-eviter{color:#ff8a7a}
+.pc-grille,.pc-dangers,.pc-regles,.sc-iles{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:12px}
+.pc-carte,.pc-danger,.pc-regle,.sc-ile{border:1px solid var(--filet);border-radius:var(--r);padding:14px 16px;background:var(--verre);font-size:15px;display:grid;gap:6px;align-content:start}
+.pc-carte header{display:flex;justify-content:space-between;gap:8px;align-items:baseline}
+.pc-carte h4,.pc-danger h4{margin:0;font:italic 500 21px/1.15 var(--disp)}
+.pc-note{color:#f2c94c;font-size:14px;white-space:nowrap;letter-spacing:1px}.pc-note .vide{color:rgba(255,255,255,.18)}
+.pc-aussi{color:var(--brume);font-size:13.5px;margin-top:-4px}
+.pc-cig{font:600 12px/1.2 var(--ui);padding:5px 9px;border-radius:999px;width:max-content;max-width:100%}
+.pc-cig.c0{background:rgba(139,209,124,.16);color:#a8e6a0}.pc-cig.c1{background:rgba(90,214,207,.14);color:#8fe3dd}
+.pc-cig.c2{background:rgba(242,201,76,.16);color:#f5d77a}.pc-cig.c3{background:rgba(255,90,79,.18);color:#ff9d94}
+.pc-att{color:#ffcfc4;font-size:14px;border-left:2px solid var(--corail);padding-left:9px}
+.pc-fait{font-size:14.5px}
+.pc-regle h3,.sc-ile h3{font:italic 500 22px/1.1 var(--disp);margin:0}
+.pc-regle ul,.sc-ile ul{margin:4px 0 0;padding-left:18px;display:grid;gap:6px;font-size:15px}
+
+/* ---------- sécurité ---------- */
+.sc-zone+.sc-zone{margin-top:22px}
+.sc-zone h3{font:600 13px/1 var(--ui);letter-spacing:.1em;text-transform:uppercase;color:var(--laiton);margin-bottom:10px}
+.sc-nums{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:10px}
+.sc-num{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:center;gap:10px 12px;border:1px solid var(--filet);border-radius:var(--r);padding:12px 14px;background:var(--verre)}
+.sc-num>div{flex:1 1 190px}.sc-num b{display:block;font-weight:600}
+.sc-num small{display:block;color:var(--brume);font-size:13px;margin-top:3px;line-height:1.35}
+.sc-appel{flex:none;background:#ff453a;color:#fff;text-decoration:none;font:700 15px/1 var(--ui);padding:11px 14px;border-radius:999px;white-space:nowrap;font-variant-numeric:tabular-nums}
+.sc-appel.sans{background:rgba(255,255,255,.12)}
+.sc-intro{color:var(--brume);margin:-6px 0 12px}
+.sc-md-box{border:1px solid var(--filet);border-radius:var(--r);padding:6px 16px 14px;background:var(--verre)}
+.sc-md td{font-size:15px}.sc-md td:first-child{color:#fff;font-weight:500}.sc-md i{color:var(--laiton)}
+.sc-protos{display:grid;gap:8px}
+.sc-proto{border:1px solid var(--filet);border-radius:var(--r);background:var(--verre)}
+.sc-proto.urg{border-left:3px solid #ff453a}
+.sc-proto summary{cursor:pointer;padding:14px 16px;font:600 17px/1.2 var(--ui);list-style:none;display:flex;gap:10px;align-items:center}
+.sc-proto summary::-webkit-details-marker{display:none}
+.sc-proto summary::after{content:"›";margin-left:auto;font-size:22px;color:var(--brume);transition:transform .2s}
+.sc-proto[open] summary::after{transform:rotate(90deg)}
+.sc-proto ol{margin:0;padding:0 18px 4px 40px;display:grid;gap:8px;font-size:15.5px}
+.sc-prev{margin:10px 16px 16px;padding:10px 12px;border-radius:12px;background:rgba(90,214,207,.1);font-size:14.5px}
+.sc-regles{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:10px 24px}
+.sc-regle{border-top:1px solid var(--filet);padding-top:10px}
+.sc-regle b{color:var(--laiton);font:600 13px/1.2 var(--ui);letter-spacing:.06em;text-transform:uppercase}
+.sc-regle p{margin-top:5px;font-size:15px}
+
+/* ---------- alarme de mouillage ---------- */
+.an{border:1px solid var(--filet);border-radius:var(--r);padding:12px;background:rgba(255,255,255,.04);display:grid;gap:10px}
+.an-mes{display:grid;grid-template-columns:repeat(3,1fr);gap:6px}
+.an-mes div{background:rgba(255,255,255,.06);border-radius:12px;padding:8px;display:grid;gap:2px;text-align:center}
+.an-mes span{font:600 10px/1.2 var(--ui);letter-spacing:.04em;text-transform:uppercase;color:var(--brume)}
+.an-mes b{font:600 20px/1.1 var(--ui);font-variant-numeric:tabular-nums}
+.an-mes b.rouge{color:#ff6b5a}
+.an-l{display:grid;gap:6px;font-size:14px;color:var(--brume)}.an-l b{color:#fff;float:right}
+.an-l input{width:100%;accent-color:var(--lagon)}
+.an-calc{font-size:12.5px}
+.an-go[aria-pressed="true"]{background:#30d158!important;color:#06111a!important}
+.an-verdict{padding:10px 12px;border-radius:12px;background:rgba(255,255,255,.08);font-size:14px}
+.an-verdict.ok{background:rgba(48,209,88,.18);color:#a8f0bb}.an-verdict.ko{background:rgba(255,69,58,.2);color:#ffb4ad}.an-verdict.moyen{background:rgba(242,201,76,.16);color:#f5d77a}
+.an-note{font-size:12px}
+.ico-ancre-m{font-size:22px;line-height:30px;text-align:center;background:rgba(6,17,26,.8);border:2px solid #5ad6cf;border-radius:50%;box-shadow:0 3px 10px rgba(0,0,0,.5)}
+.an-puce{position:absolute;left:50%;top:44px;transform:translateX(-50%);z-index:600;background:var(--verre-fort);-webkit-backdrop-filter:var(--flou);backdrop-filter:var(--flou);border:1px solid var(--filet);color:#fff;font:600 13px/1 var(--ui);padding:8px 14px;border-radius:999px;cursor:pointer;white-space:nowrap;font-variant-numeric:tabular-nums;box-shadow:var(--ombre)}
+.an-puce.veille{border-color:#30d158}
+.an-puce.alerte{background:#ff453a;border-color:#ff453a;animation:clign 1s infinite}
+@keyframes clign{50%{opacity:.6}}
+#an-alarme{position:fixed;inset:0;z-index:3000;display:grid;place-items:center;padding:20px;background:rgba(160,10,0,.55);-webkit-backdrop-filter:blur(14px);backdrop-filter:blur(14px)}
+#an-alarme[hidden]{display:none}
+.an-al-c{max-width:420px;width:100%;text-align:center;background:rgba(20,6,6,.75);border:1px solid rgba(255,255,255,.2);border-radius:26px;padding:26px 20px;box-shadow:0 20px 60px rgba(0,0,0,.6)}
+.an-al-i{font-size:56px;animation:clign 1s infinite}
+.an-al-c h2{font:700 30px/1.1 var(--ui);margin:6px 0 10px;color:#fff}
+.an-al-c p{color:#ffdcd8;font-size:16px}
+.an-al-b{display:grid;gap:8px;margin-top:18px}
+.an-al-b button{border:0;border-radius:14px;padding:14px;font:600 16px/1 var(--ui);cursor:pointer;background:rgba(255,255,255,.14);color:#fff}
+.an-al-b #an-al-voir{background:#fff;color:#7a0b00}
+
+/* ---------- menu : « Plus » sur mobile ---------- */
+nav.top .plus{display:none}
+.feuille{position:fixed;inset:0;z-index:1300;background:rgba(0,0,0,.35)}
+.feuille[hidden]{display:none}
+.feuille-c{position:absolute;left:10px;right:10px;bottom:calc(72px + env(safe-area-inset-bottom,0px));border:1px solid var(--filet);border-radius:22px;background:var(--verre-fort);-webkit-backdrop-filter:var(--flou);backdrop-filter:var(--flou);padding:8px;display:grid;grid-template-columns:1fr 1fr;gap:6px;box-shadow:0 20px 50px rgba(0,0,0,.5)}
+.feuille-c a{display:flex;align-items:center;gap:10px;padding:14px;border-radius:14px;color:#fff;text-decoration:none;font:600 15px/1 var(--ui);background:rgba(255,255,255,.06)}
+.feuille-c a.on{background:rgba(255,255,255,.16);color:var(--laiton)}
+.feuille-c svg{width:24px;height:24px;fill:none;stroke:currentColor;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round;flex:none}
+@media (max-width:620px){
+  nav.top .wrap{grid-template-columns:repeat(5,1fr)}
+  nav.top a.sec{display:none}
+  nav.top .plus{display:grid;justify-items:center;gap:3px;padding:2px 0;background:none;border:0;font:500 10px/1.1 var(--ui);color:rgba(255,255,255,.55);cursor:pointer}
+  nav.top .plus svg{display:block;width:25px;height:25px;fill:currentColor;stroke:none}
+  nav.top .plus.on{color:var(--laiton)}
+  .e3d-w{border-radius:18px;height:62vh;height:62dvh}
+  .sc-nums,.pc-grille,.pc-dangers,.pc-regles,.sc-iles,.sc-regles{grid-template-columns:minmax(0,1fr)}
+}
 @supports not ((backdrop-filter:blur(1px)) or (-webkit-backdrop-filter:blur(1px))){
   :root{--verre:rgba(18,34,46,.92);--verre-fort:rgba(14,28,40,.96)}
 }
@@ -586,12 +711,16 @@ nav.top svg{display:none}
 </div>
 <nav class="top" aria-label="Pages du site"><div class="wrap">
   <a href="#pont" data-v="pont"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 21V4h11l-2 4 2 4H5"/></svg><span><span class="art">Le </span>Pont</span></a>
-  <a href="#equipage" data-v="equipage"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="9" cy="8" r="3"/><path d="M3 20c0-3.3 2.7-6 6-6s6 2.7 6 6"/><circle cx="17" cy="9" r="2.4"/><path d="M16 14.2c2.9.4 5 2.7 5 5.8"/></svg><span><span class="art">L'</span>Équipage</span></a>
+  <a href="#equipage" data-v="equipage" class="sec"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="9" cy="8" r="3"/><path d="M3 20c0-3.3 2.7-6 6-6s6 2.7 6 6"/><circle cx="17" cy="9" r="2.4"/><path d="M16 14.2c2.9.4 5 2.7 5 5.8"/></svg><span><span class="art">L'</span>Équipage</span></a>
   <a href="#route" data-v="route"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 4 3 6v14l6-2 6 2 6-2V4l-6 2-6-2zM9 4v14M15 6v14"/></svg><span><span class="art">La </span>Route</span></a>
   <a href="#escales" data-v="escales"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 21s-7-6.2-7-11a7 7 0 0 1 14 0c0 4.8-7 11-7 11z"/><circle cx="12" cy="10" r="2.5"/></svg><span><span class="art">Les </span>Escales</span></a>
   <a href="#meteo" data-v="meteo"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="8" cy="8" r="3"/><path d="M8 2v1M2 8h1M3.8 3.8l.7.7M12.2 3.8l-.7.7M7 20h10a4 4 0 0 0 0-8 5 5 0 0 0-9.6 1.5A3.3 3.3 0 0 0 7 20z"/></svg><span><span class="art">La </span>Météo</span></a>
-  <a href="#preparatifs" data-v="preparatifs"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M10 6h10M10 12h10M10 18h10M4 6l1.2 1.2L7.5 5M4 12l1.2 1.2L7.5 11M4 18l1.2 1.2L7.5 17"/></svg><span><span class="art">Les </span>Prépa<span class="art">ratifs</span></span></a>
+  <a href="#preparatifs" data-v="preparatifs" class="sec"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M10 6h10M10 12h10M10 18h10M4 6l1.2 1.2L7.5 5M4 12l1.2 1.2L7.5 11M4 18l1.2 1.2L7.5 17"/></svg><span><span class="art">Les </span>Prépa<span class="art">ratifs</span></span></a>
+  <a href="#peche" data-v="peche" class="sec"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 12c3-4.5 8-6 12-4.5 2 .8 3.6 2.4 4.5 4.5-.9 2.1-2.5 3.7-4.5 4.5-4 1.5-9 0-12-4.5zM3 12l-1.5-3M3 12l-1.5 3"/><circle cx="16" cy="11" r=".9"/></svg><span><span class="art">La </span>Pêche</span></a>
+  <a href="#securite" data-v="securite" class="sec"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="4"/><path d="M5.6 5.6l3.6 3.6M18.4 5.6l-3.6 3.6M5.6 18.4l3.6-3.6M18.4 18.4l-3.6-3.6"/></svg><span><span class="art">La </span>Sécurité</span></a>
+  <button type="button" class="plus" id="nav-plus" aria-expanded="false" aria-controls="nav-feuille"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="5" cy="12" r="1.6"/><circle cx="12" cy="12" r="1.6"/><circle cx="19" cy="12" r="1.6"/></svg><span>Plus</span></button>
 </div></nav>
+<div class="feuille" id="nav-feuille" hidden><div class="feuille-c verre" role="menu" aria-label="Autres pages"></div></div>
 
 <main>
 <!-- ================= LE PONT ================= -->
@@ -796,6 +925,27 @@ nav.top svg{display:none}
             <button type="button" class="btn" id="btn-ret" aria-pressed="false">Réticule au centre</button>
             <button type="button" class="btn" id="btn-nuit" aria-pressed="false">Mode nuit (filtre rouge)</button>
           </div>
+          <h4 id="an-titre">Alarme de mouillage</h4>
+          <div class="an verre" id="an">
+            <p class="muted" id="an-etat">Marque l'ancre au moment où elle touche le fond, teste la prise en marche arrière, puis active la surveillance : le téléphone sonne si le bateau sort du cercle.</p>
+            <div class="an-mes" id="an-mes" hidden>
+              <div><span>Distance à l'ancre</span><b id="an-d">–</b></div>
+              <div><span>Cercle</span><b id="an-r">–</b></div>
+              <div><span>GPS</span><b id="an-p">–</b></div>
+            </div>
+            <label class="an-l">Longueur de chaîne mouillée <b id="an-ch-v">30 m</b>
+              <input type="range" id="an-ch" min="10" max="80" step="5" value="30"></label>
+            <p class="muted an-calc" id="an-calc"></p>
+            <div class="btns">
+              <button type="button" class="btn" id="an-poser">⚓ Marquer l'ancre ici</button>
+              <button type="button" class="btn" id="an-test">Tester la prise (marche arrière, 60 s)</button>
+              <div class="barre" id="an-barre" hidden><i style="width:0"></i></div>
+              <p class="an-verdict" id="an-verdict" hidden></p>
+              <button type="button" class="btn an-go" id="an-veille" aria-pressed="false">Activer la surveillance</button>
+              <button type="button" class="btn" id="an-lever" hidden>Lever l'ancre (tout effacer)</button>
+            </div>
+            <p class="muted an-note">L'iPhone coupe le GPS des pages web écran verrouillé : laisser l'écran allumé (le site l'empêche de se mettre en veille), le téléphone branché, et l'app ouverte au premier plan. Le compas du bateau et un quart de mouillage restent la vraie sécurité par fort vent.</p>
+          </div>
           <h4>Carte hors ligne</h4>
           <p class="muted" id="hl-etat">Ouvre cet onglet pour estimer le téléchargement.</p>
           <div class="btns" style="margin-top:10px">
@@ -884,6 +1034,12 @@ nav.top svg{display:none}
       <h1>Ce qu'il y a à voir, île par île</h1>
       <p>Filtre selon le membre d'équipage pour trouver ce qui lui fera poser son verre.</p>
     </header>
+    <section class="e3d-sec">
+      <div class="e3d-iles" id="e3d-iles" role="group" aria-label="Aller à une île"></div>
+      <div class="e3d-w verre"><div id="e3d" class="e3d"></div><button type="button" class="e3d-mode" id="e3d-mode">Vue à plat</button></div>
+      <div class="e3d-cats" id="e3d-cats" role="group" aria-label="Types de lieux affichés"></div>
+      <p class="muted e3d-note">Touche un symbole pour sa fiche et son histoire. Deux doigts pour incliner et tourner la carte. Relief exagéré 1,6 fois. Sentiers verts tirés d'OpenStreetMap ; positions des lieux approximatives, pas pour naviguer. Après l'ouragan Beryl (2024), vérifier sur place les restaurants de Union et Mayreau.</p>
+    </section>
     <div class="filtre" id="filtre" role="group" aria-label="Filtrer par membre d'équipage"></div>
     <div id="terr"></div>
     <div class="vue"><b>Sainte-Lucie, vue depuis la mer.</b> Pas d'escale, donc pas de formalités : on longe l'île à distance, de nuit. Il faudra se contenter des lumières de la côte et, avec un peu de lune, de la silhouette des deux Pitons classés à l'Unesco. Joseph prendra ça pour un défi.</div>
@@ -977,6 +1133,142 @@ nav.top svg{display:none}
     </section>
   </div>
 </div>
+<div class="view" id="v-peche" hidden>
+  <div class="wrap">
+    <header class="vh">
+      <div class="eyebrow">Le garde-manger de la mer</div>
+      <h1>Poissons, pêche et bêtes qui piquent</h1>
+      <p>Ce qu'on pêche à la traîne pendant les traversées, ce qu'on achète aux pêcheurs, ce qu'on relâche, et ce qu'il vaut mieux ne pas toucher, dans l'eau comme à terre.</p>
+    </header>
+
+    <section>
+      <h2 class="s">La règle d'or : la ciguatera</h2>
+      <div class="pc-cig-box verre">
+        <p>Aux Antilles, certains poissons de récif accumulent une toxine produite par une micro-algue du corail. Elle ne se voit pas, ne se sent pas et <b>résiste à la cuisson et à la congélation</b>. C'est la ciguatera : fourmillements des lèvres et des extrémités, diarrhée, vomissements, puis une sensation bizarre de chaud et froid inversés qui peut durer des semaines.</p>
+        <ul>
+          <li><b>Sans risque</b> : les poissons du large (dorade coryphène, thons, thazard, bonite).</li>
+          <li><b>À relâcher</b> : barracuda, grosse carangue, sériole, murène, gros mérou, même si le pêcheur local dit qu'il « n'y a pas de problème ici ».</li>
+          <li>Plus un prédateur de récif est gros, plus il est risqué : garder les petits (moins de 2 kg).</li>
+          <li>Ne jamais manger le foie, la tête, les œufs ni les viscères d'un poisson de récif.</li>
+          <li>Symptômes quelques heures après un repas de poisson : médecin (15 en Martinique), sans alcool ni poisson pendant plusieurs semaines.</li>
+        </ul>
+      </div>
+    </section>
+
+    <section>
+      <h2 class="s">Les poissons, du meilleur au pire</h2>
+      <p class="muted pc-leg">Étoiles : le goût. Ligne colorée : le risque de ciguatera.</p>
+      <div id="pc-poissons"></div>
+    </section>
+
+    <section>
+      <h2 class="s">Les règles de pêche</h2>
+      <div class="pc-regles">
+        <div class="verre pc-regle"><h3>Martinique</h3><ul>
+          <li>Pêche de loisir en mer libre, sans permis, mais <b>vente interdite</b> : le poisson pêché est pour l'équipage.</li>
+          <li><b>Zones interdites (chlordécone)</b> : toute pêche est interdite dans plusieurs zones polluées par un ancien pesticide, dont la <b>baie de Fort-de-France</b> (Anse Mitan, Trois-Îlets, Fort-de-France). Amende jusqu'à 45 000 €.</li>
+          <li><b>Lambi</b> : fermé du 1er janvier au 30 juin ; ouvert pendant notre séjour, 3 par jour et par pêcheur, entiers dans leur coquille.</li>
+          <li>Tailles minimales et quotas pour la langouste et plusieurs poissons, et réserves où la pêche est interdite : vérifier auprès de la base ou de la Direction de la mer avant de pêcher près des côtes.</li>
+          <li>Chasse sous-marine : sans bouteille, de jour, avec une bouée de signalisation, jamais dans une réserve.</li>
+          <li>Parc naturel marin de Martinique : respecter les herbiers et le corail, bouées quand il y en a.</li>
+        </ul></div>
+        <div class="verre pc-regle"><h3>Saint-Vincent et les Grenadines</h3><ul>
+          <li>La pêche par les visiteurs est encadrée par la Fisheries Division (Kingstown) : <b>demander à la clearance de Wallilabou</b> si une autorisation est nécessaire pour la traîne. La chasse sous-marine est en pratique interdite aux visiteurs.</li>
+          <li><b>Tobago Cays</b> : toute pêche interdite dans le parc marin (amende jusqu'à 10 000 dollars EC et prison).</li>
+          <li><b>Mustique</b> : pêche et chasse sous-marine interdites dans les eaux de l'île.</li>
+          <li>Plusieurs zones de conservation (dont des récifs autour de Bequia, Isle à Quatre, Petit Saint-Vincent) : pas de pêche.</li>
+          <li><b>Langouste</b> : pas d'achat de femelle grainée, de petite taille ou hors saison (saison fermée du 1er mai au 31 août).</li>
+          <li>La traîne au large pendant les traversées est l'usage le plus simple et le plus toléré.</li>
+        </ul></div>
+        <div class="verre pc-regle"><h3>Acheter aux pêcheurs</h3><ul>
+          <li>Marchés aux poissons : Fort-de-France, Le Marin, Kingstown, Port Elizabeth à Bequia, et au mouillage depuis les barques.</li>
+          <li>Un poisson frais a l'œil brillant et bombé, des branchies rouges, une chair ferme qui reprend sa forme.</li>
+          <li>Demander « Where was it caught? » : poisson du large plutôt que de récif.</li>
+          <li>Négocier gentiment, payer en dollars EC à Saint-Vincent, et refuser poliment barracuda et grosses carangues.</li>
+          <li>Barbecue de langouste aux Tobago Cays : convenir du prix par personne avant, il se paie à la fin.</li>
+        </ul></div>
+        <div class="verre pc-regle"><h3>La traîne depuis le catamaran</h3><ul>
+          <li>Deux lignes maximum à l'arrière, leurres colorés (poulpe en plastique), bas de ligne acier pour le thazard.</li>
+          <li>Vitesse idéale : 6 à 8 nœuds, le long des tombants et sous les oiseaux.</li>
+          <li>Rentrer les lignes avant d'entrer dans un mouillage ou un parc marin.</li>
+          <li>Prise : ralentir, gants, gaffe, un coup sec sur la tête, saigner, au frais. Un peu de rhum sur les ouïes calme le poisson tout de suite (tradition locale).</li>
+        </ul></div>
+      </div>
+    </section>
+
+    <section>
+      <h2 class="s">Dans l'eau : ce qui pique et ce qui mord</h2>
+      <div class="pc-dangers" id="pc-mer"></div>
+    </section>
+    <section>
+      <h2 class="s">À terre : bêtes et plantes à éviter</h2>
+      <div class="pc-dangers" id="pc-terre"></div>
+    </section>
+    <section class="sources">
+      <h2 class="s">Sources</h2>
+      <p>Consultées le 25 novembre 2026. Les règles de pêche changent : la base et les autorités locales font foi.</p>
+      <ul>
+        <li><a href="https://www.anses.fr/sites/default/files/TOXICOVIGILANCE2023-AST-0213.pdf" target="_blank" rel="noopener">Anses, ciguatera aux Antilles (2023)</a></li>
+        <li><a href="https://www.guadeloupe.ars.sante.fr/media/28450/download" target="_blank" rel="noopener">ARS Guadeloupe, poissons interdits à la vente</a></li>
+        <li><a href="https://www.dm.martinique.developpement-durable.gouv.fr/IMG/pdf/brochure_interdiction_peche_vf.pdf" target="_blank" rel="noopener">Direction de la mer, zones de pêche interdites (chlordécone)</a></li>
+        <li><a href="https://figaronautisme.meteoconsult.fr/actus-nautisme-escales/2025-10-07/81844-naviguer-pecher-plonger-ce-quil-faut-savoir-pour-respecter-le-parc-naturel-marin-de-martinique" target="_blank" rel="noopener">Parc naturel marin de Martinique, ce qu'il faut savoir</a></li>
+        <li><a href="https://www.tobagocays.org/?p=10" target="_blank" rel="noopener">Tobago Cays Marine Park, règlement</a></li>
+        <li><a href="https://searchlight.vc/news/2022/05/27/park-ranger-warns-fishers-not-to-set-pots-in-tobago-cays-marine-park" target="_blank" rel="noopener">Searchlight, pêche interdite aux Tobago Cays</a></li>
+        <li><a href="https://www.martinique.developpement-durable.gouv.fr/IMG/pdf/flyer_trigonocephale_a5int.pdf" target="_blank" rel="noopener">DEAL Martinique, le trigonocéphale</a></li>
+        <li><a href="https://www.larevuedupraticien.fr/article/morsures-de-serpents-ce-quil-ne-faut-pas-faire" target="_blank" rel="noopener">Revue du praticien, morsures : ce qu'il ne faut pas faire</a></li>
+        <li><a href="https://www.diplomatie.gouv.fr/fr/conseils-aux-voyageurs/fiches-pratiques/risques/les-principaux-risques-sanitaires/envenimations-terrestres-et-marines" target="_blank" rel="noopener">Diplomatie, envenimations terrestres et marines</a></li>
+        <li><a href="https://www.searchlight.vc/news/2023/04/28/stop-spreading-rumors-venomous-snakes-svg-forestry-official" target="_blank" rel="noopener">Searchlight, pas de serpent venimeux à Saint-Vincent</a></li>
+      </ul>
+    </section>
+  </div>
+</div>
+
+<div class="view" id="v-securite" hidden>
+  <div class="wrap">
+    <header class="vh">
+      <div class="eyebrow">Consignes du bord</div>
+      <h1>Sécurité : qui appeler, que faire</h1>
+      <p>À lire tous ensemble le premier soir. Les numéros se composent d'un toucher sur le téléphone. En mer, la VHF passe avant le téléphone : tout le monde l'entend, y compris les bateaux proches.</p>
+    </header>
+    <section>
+      <h2 class="s">Numéros d'urgence</h2>
+      <div id="sc-numeros"></div>
+    </section>
+    <section>
+      <h2 class="s">Lancer un MAYDAY à la VHF</h2>
+      <p class="sc-intro">Canal 16, puissance haute, bouton appuyé pendant qu'on parle, lentement. Ou d'abord le bouton rouge DISTRESS (DSC) maintenu 5 secondes, qui envoie la position automatiquement.</p>
+      <div id="sc-mayday" class="verre sc-md-box"></div>
+    </section>
+    <section>
+      <h2 class="s">Que faire si…</h2>
+      <p class="sc-intro">Touche une situation pour voir le protocole.</p>
+      <div id="sc-protos" class="sc-protos"></div>
+    </section>
+    <section>
+      <h2 class="s">Île par île</h2>
+      <div id="sc-iles" class="sc-iles"></div>
+    </section>
+    <section>
+      <h2 class="s">Les règles du bord</h2>
+      <div id="sc-regles" class="sc-regles"></div>
+    </section>
+    <section class="sources">
+      <h2 class="s">Sources</h2>
+      <p>Consultées le 25 novembre 2026. Les numéros marqués « à vérifier » viennent de guides officiels étrangers : les confirmer à la clearance.</p>
+      <ul>
+        <li><a href="https://www.martinique.gouv.fr/index.php/contenu/telechargement/6188/33718/file/CP%20Le%20196%20-%20Num%C3%A9ro%20d'urgence%20gratuit%20du%20CROSS.pdf" target="_blank" rel="noopener">Préfecture de Martinique, le 196 du CROSS</a></li>
+        <li><a href="https://www.dm.martinique.developpement-durable.gouv.fr/IMG/pdf/bilan_annuel_crossag_2025_-_final.pdf" target="_blank" rel="noopener">CROSS Antilles-Guyane, bilan 2025</a></li>
+        <li><a href="https://www.itopf.org/knowledge-resources/countries-territories-regions/french-antilles/" target="_blank" rel="noopener">ITOPF, contacts CROSS AG</a></li>
+        <li><a href="https://travel.gc.ca/assistance/embassies-consulates/saint-vincent-the-grenadines" target="_blank" rel="noopener">Gouvernement du Canada, urgences à Saint-Vincent</a></li>
+        <li><a href="https://www.searchlight.vc/front-page/2023/03/31/wear-life-jacket-coast-guard-service" target="_blank" rel="noopener">Gardes-côtes de SVG, VHF 16 et DSC 70</a></li>
+        <li><a href="https://www.nbcsvg.com/2022/12/29/northern-grenadines-sub-base-of-svg-coastguard-officially-re-established-on-bequia/" target="_blank" rel="noopener">Antenne des gardes-côtes à Bequia</a></li>
+        <li><a href="https://www.sante.fr/node/19961849" target="_blank" rel="noopener">Santé.fr, hôpital Sud Caraïbe du Marin</a></li>
+        <li><a href="https://www.noonsite.com/?p=73351642" target="_blank" rel="noopener">Noonsite, SVG après l'ouragan Beryl</a></li>
+        <li><a href="https://www.stvincenttimes.com/tcmp-places-ban-on-anchoring-at-petit-tabac/" target="_blank" rel="noopener">Tobago Cays, ancre interdite à Petit Tabac</a></li>
+      </ul>
+    </section>
+  </div>
+</div>
 </main>
 <footer><div class="wrap">Sur ce navire, on ne jette que l'ancre.</div></footer>
 
@@ -984,18 +1276,35 @@ nav.top svg{display:none}
 <script src="carte.js"></script>
 <script src="routage.js"></script>
 <script src="instruments.js"></script>
+<script src="peche.js"></script>
+<script src="securite.js"></script>
+<script src="ancre.js"></script>
+<script src="escales3d.js"></script>
 <script>
 const $=(s,r=document)=>r.querySelector(s), $$=(s,r=document)=>[...r.querySelectorAll(s)];
 const esc=s=>String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;');
 
 /* --- vues --- */
-const VIEWS=['pont','equipage','route','escales','meteo','preparatifs'];
+const VIEWS=['pont','equipage','route','escales','meteo','preparatifs','peche','securite'];
+function fermerFeuille(){const f=$('#nav-feuille');if(f&&!f.hidden){f.hidden=true;$('#nav-plus').setAttribute('aria-expanded','false')}}
+document.addEventListener('click',e=>{
+  const b=e.target.closest('#nav-plus');
+  if(b){const f=$('#nav-feuille'),c=f.firstElementChild;
+    if(f.hidden){c.innerHTML=$$('nav.top a.sec').map(a=>'<a href="'+a.getAttribute('href')+'" role="menuitem" class="'+(a.classList.contains('on')?'on':'')+'">'+a.querySelector('svg').outerHTML+'<span>'+a.querySelector('span').textContent+'</span></a>').join('');f.hidden=false;b.setAttribute('aria-expanded','true')}
+    else fermerFeuille();return}
+  if(e.target.id==='nav-feuille')fermerFeuille();
+});
+document.addEventListener('keydown',e=>{if(e.key==='Escape')fermerFeuille()});
 function show(v,scroll){
   if(!VIEWS.includes(v))v='pont';
   VIEWS.forEach(x=>{$('#v-'+x).hidden=x!==v});
   $$('nav.top a').forEach(a=>{const on=a.dataset.v===v;a.classList.toggle('on',on);on?a.setAttribute('aria-current','page'):a.removeAttribute('aria-current')});
   if(v==='route')Carte.visible();
   if(v==='meteo'&&window.MeteoEscales)MeteoEscales.visible();
+  if(v==='peche'&&window.Peche)Peche.visible();
+  if(v==='securite'&&window.Securite)Securite.visible();
+  if(v==='escales'&&window.Escales3D)Escales3D.visible();
+  const pl=$('#nav-plus');if(pl){pl.classList.toggle('on',['equipage','preparatifs','peche','securite'].includes(v));fermerFeuille()}
   if(scroll)window.scrollTo(0,0);
   try{localStorage.setItem('fc-vue',v)}catch(e){}
 }
@@ -1165,7 +1474,7 @@ $('#terr').innerHTML=TERR.map(t=>`<div class="terr"><div><h2>${t.n}</h2><dl>${t.
  <div class="lieux">${t.l.map(l=>`<article class="lieu" data-c="${l[3]}"><h3>${esc(l[0])}</h3><span class="w">${esc(l[1])}</span><p>${esc(l[2])}</p></article>`).join('')}</div></div>`).join('');
 $('#filtre').addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;
  $$('#filtre button').forEach(x=>x.classList.toggle('on',x===b));const c=b.dataset.c;
- $$('.lieu').forEach(l=>l.classList.toggle('off',c!=='tous'&&!l.dataset.c.split(' ').includes(c)))});
+ $$('#terr .lieu[data-c]').forEach(l=>l.classList.toggle('off',c!=='tous'&&!l.dataset.c.split(' ').includes(c)))});
 
 /* --- préparatifs --- */
 const H=[['13:40','Atterrissage à Fort-de-France. Bagages, café, premier soleil.'],['14:30','Transfert en van vers Le Marin. Compter environ une heure, plus le vendredi après-midi.'],['15:30','Courses : Carrefour Market à Montgérald en voiture, ou Auchan Mondésir à pied depuis la marina. Livraison à bord à demander à la base.'],['17:30','Bagages à la base, frais au frigo.'],['18:00','Embarquement, heure à confirmer avec Star Voyage. Installation des cabines, cartons laissés à quai.'],['20:00','Dîner au Marin. La première tournée est pour le capitaine.']];
