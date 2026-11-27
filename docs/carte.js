@@ -419,10 +419,7 @@
 
   /* GPS partagé : la carte et le compas écoutent le même suivi (événement nav:pos) */
   const GPS = { suivi: null, derniere: null, pos: null, demandeurs: new Set() };
-  function gpsDemarrer(qui) {
-    GPS.demandeurs.add(qui);
-    if (GPS.suivi != null) return true;
-    if (!navigator.geolocation) return false;
+  function gpsLancer() {
     GPS.suivi = navigator.geolocation.watchPosition(p => {
       const ll = [p.coords.latitude, p.coords.longitude], der = GPS.derniere;
       let cog = p.coords.heading, sog = p.coords.speed != null ? p.coords.speed * 1.94384 : null;
@@ -430,11 +427,30 @@
       if (sog == null && der && p.timestamp > der.t) sog = milles(der.ll, ll) / ((p.timestamp - der.t) / 3600e3);
       if (cog != null && Number.isNaN(cog)) cog = null;
       if (sog != null && !isFinite(sog)) sog = null;
-      GPS.derniere = { ll, t: p.timestamp };
+      GPS.derniere = { ll, t: p.timestamp }; GPS.recu = Date.now();
       GPS.pos = { ll, cog, sog, prec: p.coords.accuracy, t: p.timestamp };
       document.dispatchEvent(new CustomEvent('nav:pos', { detail: GPS.pos }));
-    }, e => document.dispatchEvent(new CustomEvent('nav:pos-err', { detail: e.code })),
-    { enableHighAccuracy: true, maximumAge: 3000, timeout: 30000 });
+    }, e => {
+      // accès refusé : le suivi est mort, on le libère pour qu'une nouvelle touche redemande l'accès
+      if (e.code === 1 && GPS.suivi != null) { navigator.geolocation.clearWatch(GPS.suivi); GPS.suivi = null; }
+      document.dispatchEvent(new CustomEvent('nav:pos-err', { detail: e.code }));
+    }, { enableHighAccuracy: true, maximumAge: 3000, timeout: 30000 });
+    GPS.lance = Date.now();
+  }
+  function gpsRelancer() { // iOS coupe parfois le suivi quand l'app passe en arrière-plan
+    if (!GPS.demandeurs.size || !navigator.geolocation) return;
+    if (GPS.suivi != null) navigator.geolocation.clearWatch(GPS.suivi);
+    gpsLancer();
+  }
+  document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'visible') gpsRelancer(); });
+  setInterval(() => { // plus de position depuis 45 s alors qu'on suit : on relance
+    if (GPS.suivi != null && GPS.demandeurs.size && document.visibilityState === 'visible' && Date.now() - Math.max(GPS.recu || 0, GPS.lance || 0) > 45000) gpsRelancer();
+  }, 15000);
+  function gpsDemarrer(qui) {
+    GPS.demandeurs.add(qui);
+    if (GPS.suivi != null) return true;
+    if (!navigator.geolocation) return false;
+    gpsLancer();
     return true;
   }
   function gpsArreter(qui) {
@@ -569,7 +585,18 @@
   document.addEventListener('nav:cap', () => { const t = performance.now(); if (t - capT > 160) { capT = t; majBateau(); } });
   document.addEventListener('nav:etape', () => majBateau());
   document.addEventListener('nav:plan', () => majBateau());
-  document.addEventListener('nav:pos-err', e => { if (carteSuit) $('#pos-res').textContent = e.detail === 1 ? 'Accès à la position refusé dans le navigateur.' : 'Position indisponible pour le moment.'; });
+  document.addEventListener('nav:pos-err', e => {
+    if (!carteSuit) return;
+    const refus = e.detail === 1;
+    const txt = refus ? 'Position refusée. iPhone : Réglages › Confidentialité et sécurité › Service de localisation (activé), puis « Sites web Safari » › « Lorsque l\'app est active » et « Position exacte ». Puis touche à nouveau le compas.'
+      : !window.isSecureContext ? 'Le GPS demande une adresse https.'
+      : 'GPS en attente : pas encore de signal (à l\'intérieur, le fix peut prendre une minute).';
+    $('#pos-res').textContent = txt;
+    if (refus) { // on arrête proprement : la prochaine touche redemande l'accès
+      carteSuit = false; gpsArreter('carte'); memo(false); majBoutonsPos();
+      if (widget) { widgetRepos(); widget.querySelector('.mc-l').innerHTML = 'Position refusée<br>touche pour réessayer'; }
+    } else if (widget && !GPS.pos) widget.querySelector('.mc-l').innerHTML = 'GPS : pas de signal<br>encore…';
+  });
 
   /* ---------- bateaux autour : carte AIS VesselFinder ---------- */
   function bateaux() {
